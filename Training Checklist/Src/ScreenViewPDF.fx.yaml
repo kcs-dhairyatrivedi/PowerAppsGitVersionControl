@@ -74,7 +74,7 @@ ScreenViewPDF As screen:
         Fill: =lblHomeScreenTitle.Fill
         Height: =lblHomeScreenTitle.Height
         Size: =lblHomeScreenTitle.Size
-        Text: ="View PDF"
+        Text: ="View PDF 1"
         Width: =640
         ZIndex: =1
 
