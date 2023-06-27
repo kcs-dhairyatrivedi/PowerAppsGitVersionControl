@@ -91,7 +91,7 @@ ScreenSubModule As screen:
         Fill: =lblHomeScreenTitle.Fill
         Height: =lblHomeScreenTitle.Height
         Size: =lblHomeScreenTitle.Size
-        Text: ="Child Modules"
+        Text: ="Child Modules L1"
         Width: =640
         ZIndex: =2
 
