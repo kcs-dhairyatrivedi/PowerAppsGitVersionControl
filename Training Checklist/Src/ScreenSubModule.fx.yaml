@@ -118,7 +118,7 @@ ScreenSubModule As screen:
         Height: =150
         Size: =lblProduct.Size
         Text: |-
-            ="Remarks:"
+            ="Remarks 56:"
         Width: =148
         X: =2
         Y: =SubModulesSeparator.Y + SubModulesSeparator.Height + 5
