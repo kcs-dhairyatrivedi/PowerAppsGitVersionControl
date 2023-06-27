@@ -224,7 +224,7 @@ ScreenAddNewSession As screen:
                 FontWeight: =lblTitle.FontWeight
                 Height: =48
                 Size: =lblProduct.Size
-                Text: =Parent.DisplayName
+                Text: =Parent.DisplayName & " V4"
                 Width: =Parent.Width - 60
                 Wrap: =false
                 X: =30
