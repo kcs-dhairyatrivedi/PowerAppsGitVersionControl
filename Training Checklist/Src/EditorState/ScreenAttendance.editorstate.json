@@ -558,7 +558,7 @@
       "LayoutName": "",
       "MetaDataIDKey": "",
       "Name": "btnAttendanceBack",
-      "ParentIndex": 12,
+      "ParentIndex": 11,
       "PersistMetaDataIDKey": false,
       "Properties": [
         {
@@ -919,7 +919,7 @@
       "LayoutName": "",
       "MetaDataIDKey": "",
       "Name": "btnAttendanceNext",
-      "ParentIndex": 11,
+      "ParentIndex": 12,
       "PersistMetaDataIDKey": false,
       "Properties": [
         {
@@ -1212,7 +1212,7 @@
       "LayoutName": "",
       "MetaDataIDKey": "",
       "Name": "btnSaveAttendance",
-      "ParentIndex": 0,
+      "ParentIndex": 2,
       "PersistMetaDataIDKey": false,
       "Properties": [
         {
@@ -2470,7 +2470,7 @@
       "LayoutName": "vertical",
       "MetaDataIDKey": "",
       "Name": "FormAddAttendance",
-      "ParentIndex": 2,
+      "ParentIndex": 5,
       "PersistMetaDataIDKey": false,
       "Properties": [
         {
@@ -2891,7 +2891,7 @@
       "LayoutName": "",
       "MetaDataIDKey": "",
       "Name": "IconAttendanceHome",
-      "ParentIndex": 4,
+      "ParentIndex": 3,
       "PersistMetaDataIDKey": false,
       "Properties": [
         {
@@ -4302,7 +4302,7 @@
       "LayoutName": "",
       "MetaDataIDKey": "",
       "Name": "imgLoader",
-      "ParentIndex": 3,
+      "ParentIndex": 1,
       "PersistMetaDataIDKey": false,
       "Properties": [
         {
@@ -7203,7 +7203,7 @@
       "LayoutName": "",
       "MetaDataIDKey": "",
       "Name": "lblViewAttendanceTitle",
-      "ParentIndex": 1,
+      "ParentIndex": 0,
       "PersistMetaDataIDKey": false,
       "Properties": [
         {
@@ -7521,7 +7521,7 @@
       "LayoutName": "",
       "MetaDataIDKey": "",
       "Name": "RadioAttType",
-      "ParentIndex": 5,
+      "ParentIndex": 4,
       "PersistMetaDataIDKey": false,
       "Properties": [
         {
