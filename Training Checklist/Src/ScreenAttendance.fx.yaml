@@ -1,0 +1,713 @@
+ScreenAttendance As screen:
+    Fill: =ScreenHome.Fill
+    OnVisible: |-
+        =UpdateContext({varViewFullImg: false});
+        UpdateContext({varImgErrorMsg: ""});
+        UpdateContext({varIsValidData: false});
+        
+        //When integration is enabled
+        /*If(
+            Not(IsBlank(GalleryHistoricData.Selected.AttendanceImage)),
+            UpdateContext({varDefaultRadio: "Use Image"}),
+            ClearCollect(
+                collAttendances,
+                Filter(
+                    AttendanceTraining,
+                    SessionID = Text(GalleryHistoricData.Selected.ID)
+                )
+            );
+            If(
+                CountIf(
+                    collAttendances,
+                    true
+                ) > 0,
+                ClearCollect(
+                    collAttendees,
+                    Filter(
+                        AttendeeDetails,
+                        AttendanceID = First(collAttendances).ID
+                    )
+                );
+                ,
+                UpdateContext(
+                    {
+                        varNoDataMsg: "No Attendance found for specified training.
+        Kindly add attendance in Attendance app and try again."
+                    }
+                )
+            );
+            If(
+                CountIf(
+                    collAttendees,
+                    true
+                ) <= 0 && CountIf(
+                    collAttendances,
+                    true
+                ) > 0,
+                UpdateContext({varNoDataMsg: "No Attendee Data Found"})
+            );
+            If(
+                CountIf(
+                    collAttendances,
+                    true
+                ) > 0,
+                UpdateContext({varDefaultRadio: "Use Attendance App"});
+                Patch(
+                    TrainingSessionDetails,
+                    First(
+                        Filter(
+                            TrainingSessionDetails,
+                            ID = GalleryHistoricData.Selected.ID
+                        )
+                    ),
+                    {IsAppAttendance: true}
+                )
+            )
+        );*/
+
+    lblViewAttendanceTitle As label:
+        Align: =Align.Center
+        Color: =lblHomeScreenTitle.Color
+        Fill: =lblHomeScreenTitle.Fill
+        Height: =lblHomeScreenTitle.Height
+        Size: =lblHomeScreenTitle.Size
+        Text: =varAddAttScreenTitle
+        Width: =640
+        ZIndex: =1
+
+    RadioAttType As radio:
+        Default: |-
+            =//When integration is enabled
+            //varDefaultRadio
+        DisplayMode: |-
+            =/*If(
+                Self.Selected.Value = "Use Image",
+                If(
+                    imgAttendance.Image = Blank() && !GalleryHistoricData.Selected.IsSubmitted,
+                    DisplayMode.Edit,
+                    DisplayMode.Disabled
+                ),
+                If(
+                    Self.Selected.Value = "Use Attendance App",
+                    If(
+                        !GalleryHistoricData.Selected.IsSubmitted && CountIf(
+                            collAttendances,
+                            true
+                        ) <= 0,
+                        DisplayMode.Edit,
+                        DisplayMode.Disabled
+                    )
+                )
+            )*/
+            /*If(
+                CountIf(
+                    collAttendances,
+                    true
+                ) > 0,
+                DisplayMode.View,
+                If(
+                    Not(IsBlank(GalleryHistoricData.Selected.AttendanceImage)),
+                    DisplayMode.View
+                ),
+                DisplayMode.Edit
+            )*/
+        Height: =96
+        Items: =["Use Image", "Use Attendance App"]
+        Layout: =Layout.Horizontal
+        OnChange: =If(RadioAttType.Selected.Value = "Use Image" && !varIsSubmiited && IsBlank(GalleryHistoricData.Selected.'Attendance Image'), NewForm(FormAddAttendance))
+        Size: =21
+        Visible: |-
+            =//true When integration is enabled
+            false
+        Width: =Parent.Width
+        X: =lblViewAttendanceTitle.X
+        Y: =lblViewAttendanceTitle.Y + lblViewAttendanceTitle.Height
+        ZIndex: =2
+
+    FormAddAttendance As form:
+        DataSource: ='Training Session Details'
+        DefaultMode: =FormMode.New
+        Height: =FormAddNewSession.Height
+        Item: =collCurrentItem
+        Visible: |-
+            =true
+            //When integration is enabled
+            //RadioAttType.Selected.Value = "Use Image"
+        Width: =Parent.Width
+        X: =lblViewAttendanceTitle.X
+        Y: =lblViewAttendanceTitle.Y + lblViewAttendanceTitle.Height
+        ZIndex: =3
+
+        AttendanceImage_DataCard2 As typedDataCard.addLargePictureCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AttendanceImage"
+            Default: =ThisItem.'Attendance Image'
+            DisplayMode: |-
+                =//Parent.DisplayMode
+                DisplayMode.Edit
+            DisplayName: ="Attendance Image"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =imgAttendance.Image
+            Width: =640
+            X: =0
+            Y: =
+            ZIndex: =1
+
+            lblAttendanceImageTitle As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            imgAttendance As image:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DisplayMode: =Parent.DisplayMode
+                Height: =AddPictureAttendance.Height
+                Image: |-
+                    =If(
+                        IsBlank(AddPictureAttendance.Media),
+                        Parent.Default,
+                        AddPictureAttendance.Media
+                    )
+                ImageRotation: =varImgRot
+                OnSelect: |-
+                    =Notify("Selected");
+                    UpdateContext({varViewFullImg: true});
+                Tooltip: =Parent.DisplayName
+                Width: =AddPictureAttendance.Width
+                X: =AddPictureAttendance.X
+                Y: =AddPictureAttendance.Y
+                ZIndex: =2
+
+            AddPictureAttendance As addMedia:
+                DisplayMode: =Parent.DisplayMode
+                Height: =320
+                Text: ="Tap or click to add a picture"
+                Visible: =Not(FormAddAttendance.Mode = FormMode.View)
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =lblAttendanceImageTitle.Y + lblAttendanceImageTitle.Height + 10
+                ZIndex: =3
+
+            ErrorMessage19 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =24
+                Text: =varImgErrorMsg
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =imgAttendance.Y + imgAttendance.Height
+                ZIndex: =4
+
+            StarVisible19 As label:
+                Align: =Align.Center
+                Height: =lblAttendanceImageTitle.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lblAttendanceImageTitle.Y
+                ZIndex: =5
+
+            iconResetImg As icon.Reset:
+                Color: =NextArrow1.Color
+                Height: =NextArrow1.Height - 10
+                Icon: =Icon.Reset
+                OnSelect: |-
+                    =Reset(AddPictureAttendance);
+                    If(varViewFullImg, UpdateContext({varViewFullImg: false}))
+                Tooltip: ="Reset Image"
+                Visible: =FormAddAttendance.Mode = FormMode.Edit || FormAddAttendance.Mode = FormMode.New
+                Width: =NextArrow1.Width - 10
+                X: =566
+                Y: =lblViewAttendanceTitle.Y
+                ZIndex: =6
+
+    btnSaveAttendance As icon.Save:
+        Color: =IconAddNew.Color
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.Save
+        OnSelect: |-
+            =UpdateContext({varVisibleSpinner: true});
+            If(
+                imgAttendance.Image = Blank(),
+                UpdateContext({varImgErrorMsg: "Attendance Image is required"});
+                UpdateContext({varIsValidData: false})
+            );
+            If(
+                Not(imgAttendance.Image = Blank()),
+                UpdateContext({varImgErrorMsg: ""});
+                UpdateContext({varIsValidData: true});
+                
+            );
+            If(
+                varIsValidData,
+                Patch(
+                    'Training Session Details',
+                    First(
+                        Filter(
+                            'Training Session Details',
+                            ID = varNewItemID
+                        )
+                    ),
+                    {'Attendance Image': imgAttendance.Image}
+                );
+                ViewForm(FormAddAttendance);
+                ResetForm(FormSignature);
+                NewForm(FormSignature);
+                Set(
+                    IsPenInputVisible,
+                    true
+                );
+                Navigate(
+                    ScreenSignature,
+                    ScreenTransition.Cover
+                );
+                Set(
+                    varAddSigScreenTitle,
+                    "Add Signature"
+                );
+                If(
+                    !varIsAdminUser,
+                    ClearCollect(
+                        collHistoricData,
+                        SortByColumns(
+                            Filter(
+                                'Training Session Details',
+                                'Created By'.Email = User().Email
+                            ),
+                            "ID",
+                            SortOrder.Descending
+                        )
+                    ),
+                    ClearCollect(
+                        collHistoricData,
+                        SortByColumns(
+                            'Training Session Details',
+                            "ID",
+                            SortOrder.Descending
+                        )
+                    )
+                );
+                
+            );
+            UpdateContext({varVisibleSpinner: false});
+        Tooltip: ="Save"
+        Visible: |-
+            =Not(FormAddAttendance.Mode = FormMode.View) && !GalleryHistoricData.Selected.IsSubmitted
+            //When integration is enabled
+            //Not(FormAddAttendance.Mode = FormMode.View) && !GalleryHistoricData.Selected.IsSubmitted && RadioAttType.Selected.Value = "Use Image"
+        X: =lblViewAttendanceTitle.Width - Self.Width - 10
+        Y: =lblViewAttendanceTitle.Height - Self.Height - 10
+        ZIndex: =4
+
+    ContainerViewAttImg As groupContainer.manualLayoutContainer:
+        Fill: =ScreenHome.Fill
+        Height: =FormAddAttendance.Height
+        Visible: =varViewFullImg
+        Width: =Parent.Width
+        Y: =btnZoom.Y + btnZoom.Height + 6
+        ZIndex: =6
+
+        imgFullSizeAtt As image:
+            Height: =Parent.Height
+            Image: =imgAttendance.Image
+            ImageRotation: =varImgRot
+            Width: =Parent.Width
+            X: =Parent.X
+            ZIndex: =1
+
+    ContainerAttApp As groupContainer.manualLayoutContainer:
+        Height: =Parent.Height - lblViewAttendanceTitle.Height - RadioAttType.Height
+        Visible: =RadioAttType.Selected.Value = "Use Attendance App"
+        Width: =Parent.Width
+        Y: =RadioAttType.Y + RadioAttType.Height
+        ZIndex: =8
+
+        "GalleryViewAttendance As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+            Height: =Parent.Height - iconRefresh.Height -10
+            Items: =//collAttendees
+            Layout: =Layout.Vertical
+            TemplatePadding: =0
+            TemplateSize: =150
+            Visible: =//CountIf(collAttendees,true) > 0
+            Width: =Parent.Width
+            X: =Parent.X
+            Y: =iconRefresh.Y + iconRefresh.Height
+            ZIndex: =2
+
+            imgSignature As image:
+                Height: =130
+                Image: =//ThisItem.Signature
+                OnSelect: =Select(Parent)
+                Width: =130
+                X: =10
+                Y: =10
+                ZIndex: =1
+
+            lblFullnameTitle As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =18
+                Text: |-
+                    ="Full Name:"
+                VerticalAlign: =VerticalAlign.Top
+                Width: =145
+                X: =imgSignature.X + imgSignature.Width +10
+                Y: =imgSignature.Y + 10
+                ZIndex: =2
+
+            lblMobileNumberTitle As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    ="Mobile Number:"
+                VerticalAlign: =VerticalAlign.Top
+                Width: =205
+                X: =lblFullnameTitle.X
+                Y: =lblFullnameTitle.Y + lblFullnameTitle.Height+ 5
+                ZIndex: =3
+
+            Separator3 As rectangle:
+                Height: =1
+                OnSelect: =Select(Parent)
+                Width: =Parent.TemplateWidth
+                Y: =Parent.TemplateHeight - 1
+                ZIndex: =5
+
+            lblFullnameData As label:
+                FontWeight: =FontWeight.Normal
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =18
+                Text: =//ThisItem.'Full Name'
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.TemplateWidth - imgSignature.Width - lblFullnameTitle.Width - 104
+                X: =lblFullnameTitle.X + lblMobileNumberTitle.Width
+                Y: =lblFullnameTitle.Y
+                ZIndex: =6
+
+            lblMobileNumberData As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =//ThisItem.MobileNumber
+                VerticalAlign: =VerticalAlign.Top
+                Width: =lblFullnameData.Width
+                X: =lblFullnameData.X
+                Y: =lblMobileNumberTitle.Y
+                ZIndex: =7
+
+            lblAttendanceDateTitle As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    ="Attendance Date:"
+                VerticalAlign: =VerticalAlign.Top
+                Width: =205
+                X: =lblFullnameTitle.X
+                Y: =lblMobileNumberTitle.Y + lblMobileNumberTitle.Height + 5
+                ZIndex: =8
+
+            lblAttendanceDateData As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    =/*Concatenate(
+                        Text(
+                            DateValue(ThisItem.'Created On'),
+                            "dd/mm/yyyy"
+                        ),
+                        " ",
+                        Text(
+                            If(
+                                Mod(
+                                    Hour(ThisItem.'Created On'),
+                                    12
+                                ) = 0,
+                                Concatenate(
+                                    12,
+                                    ":",
+                                    If(Len(Minute(ThisItem.'Created On')) = 1, Concatenate("0",Minute(ThisItem.'Created On')), Minute(ThisItem.'Created On'))
+                                ),
+                                Concatenate(
+                                    Mod(
+                                        Hour(ThisItem.'Created On'),
+                                        12
+                                    ),
+                                    ":",
+                                    If(Len(Minute(ThisItem.'Created On')) = 1, Concatenate("0",Minute(ThisItem.'Created On')), Minute(ThisItem.'Created On'))
+                                )
+                            ),
+                            "[$-en-US]00"
+                        ),
+                        If(
+                            Hour(ThisItem.'Created On') < 12,
+                            " AM",
+                            " PM"
+                        )
+                    )*/
+                VerticalAlign: =VerticalAlign.Top
+                Width: =lblFullnameData.Width
+                X: =lblFullnameData.X
+                Y: =lblAttendanceDateTitle.Y
+                ZIndex: =9
+
+        iconRefresh As icon.Reload:
+            Color: =RGBA(0, 0, 0, 1)
+            Height: =NextArrow1.Height
+            Icon: =Icon.Reload
+            OnSelect: |-
+                =/*ClearCollect(
+                    collAttendances,
+                    Filter(
+                        AttendanceTraining,
+                        SessionID = Text(GalleryHistoricData.Selected.ID)
+                    )
+                );
+                If(
+                    CountIf(
+                        collAttendances,
+                        true
+                    ) > 0,
+                    ClearCollect(
+                        collAttendees,
+                        Filter(
+                            AttendeeDetails,
+                            AttendanceID = First(collAttendances).ID
+                        )
+                    )
+                );
+                */
+            Width: =NextArrow1.Width
+            X: =Parent.Width - Self.Width - 10
+            Y: =10
+            ZIndex: =5
+
+        lblNoAttDataMsg As label:
+            Align: =Align.Center
+            Height: =GalleryViewAttendance.Height
+            Size: =21
+            Text: |-
+                =//When integration is enabled
+                //varNoDataMsg
+            Visible: =//CountIf(collAttendees,true) <= 0
+            Width: =GalleryViewAttendance.Width
+            X: =GalleryViewAttendance.X
+            Y: =GalleryViewAttendance.Y
+            ZIndex: =6
+
+        SeparatorGalleryTop As rectangle:
+            Height: =1
+            OnSelect: =
+            Width: =Parent.Width
+            X: =RadioAttType.X
+            Y: =iconRefresh.Y + iconRefresh.Height + 5
+            ZIndex: =7
+
+        lblCountAttendees As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =70
+            Size: =21
+            Text: |-
+                ="Total Attendees: " & CountIf(GalleryViewAttendance.AllItems,true)
+            Width: =560
+            ZIndex: =8
+
+    SeparatorRadio As rectangle:
+        Height: =1
+        OnSelect: =
+        Visible: |-
+            =//true When integration is enabled
+            false
+        Width: =Parent.Width
+        X: =RadioAttType.X
+        Y: =RadioAttType.Y + RadioAttType.Height
+        ZIndex: =11
+
+    imgLoader As image:
+        Height: =1136
+        Image: ='Spinner-1s-200px'
+        Visible: =varVisibleSpinner
+        Width: =FormAddAttendance.Width
+        X: =FormAddAttendance.X
+        ZIndex: =12
+
+    btnZoom As button:
+        Color: =btnAddNewYes.Color
+        Fill: =btnAddNewYes.Fill
+        FontWeight: =btnAddNewYes.FontWeight
+        Height: =btnAddNewYes.Height
+        OnSelect: |-
+            =If(
+                Not(varViewFullImg),
+                UpdateContext({varViewFullImg: true});
+                ,
+                UpdateContext({varViewFullImg: false});
+                
+            )
+        RadiusBottomLeft: =5
+        RadiusBottomRight: =5
+        RadiusTopLeft: =5
+        RadiusTopRight: =5
+        Size: =btnAddNewYes.Size
+        Text: |-
+            =If(
+                !varViewFullImg,
+                "Zoom",
+                "Close"
+            )
+        Tooltip: =If(Self.Text = "Zoom", "Zoom", "Close")
+        Visible: =FormAddAttendance.Mode = FormMode.View && FormAddAttendance.Visible || Not(IsBlank(imgAttendance.Image))
+        Width: =btnAddNewYes.Width
+        X: =iconResetImg.X - Self.Width - 10
+        Y: =lblAttendanceImageTitle.Y + lblViewAttendanceTitle.Height
+        ZIndex: =13
+
+    iconRotate As image:
+        Height: =NextArrow1.Height
+        Image: ='icons8-rotate-right-60'
+        OnSelect: |-
+            =Switch(
+                varImgRot,
+                ImageRotation.None,
+                UpdateContext({varImgRot: imgAttendance.ImageRotation.Rotate90}),
+                ImageRotation.Rotate90,
+                UpdateContext({varImgRot: imgAttendance.ImageRotation.Rotate180}),
+                ImageRotation.Rotate180,
+                UpdateContext({varImgRot: imgAttendance.ImageRotation.Rotate270}),
+                ImageRotation.Rotate270,
+                UpdateContext({varImgRot: imgAttendance.ImageRotation.None}),
+                UpdateContext({varImgRot: imgAttendance.ImageRotation.None})
+            )
+        Tooltip: ="Rotate"
+        Visible: =FormAddAttendance.Mode = FormMode.View && FormAddAttendance.Visible || Not(IsBlank(imgAttendance.Image))
+        Width: =NextArrow1.Width
+        X: =btnZoom.X - Self.Width - 10
+        Y: =btnZoom.Y - 5
+        ZIndex: =14
+
+    btnAttendanceBack As button:
+        Color: =btnAddNewBack.Color
+        Fill: =btnAddNewBack.Fill
+        FontWeight: =btnAddNewBack.FontWeight
+        Height: =btnAddNewBack.Height
+        OnSelect: =Navigate(ScreenParentModules, ScreenTransition.Cover);
+        RadiusBottomLeft: =5
+        RadiusBottomRight: =5
+        RadiusTopLeft: =5
+        RadiusTopRight: =5
+        Size: =btnAddNewBack.Size
+        Text: ="Back"
+        Tooltip: =btnAddNewBack.Tooltip
+        Visible: =!varViewFullImg
+        Width: =btnAddNewBack.Width
+        X: =FormAddAttendance.X + 50
+        Y: =FormAddAttendance.Y + FormAddAttendance.Height + 50
+        ZIndex: =15
+
+    btnAttendanceNext As button:
+        Color: =btnAddNewBack.Color
+        Fill: =btnAddNewBack.Fill
+        FontWeight: =btnAddNewBack.FontWeight
+        Height: =btnAddNewBack.Height
+        OnSelect: |-
+            =If(
+                IsBlank(GalleryHistoricData.Selected.'Authorized Signature'),
+                NewForm(FormSignature),
+                If(
+                    Not(IsBlank(GalleryHistoricData.Selected.'Authorized Signature')),
+                    ViewForm(FormSignature);
+                    Set(
+                    varAddSigScreenTitle,
+                    "View Signature"
+                );
+                )
+            );
+            Navigate(
+                ScreenSignature,
+                ScreenTransition.Cover
+            )
+        RadiusBottomLeft: =5
+        RadiusBottomRight: =5
+        RadiusTopLeft: =5
+        RadiusTopRight: =5
+        Size: =btnAddNewBack.Size
+        Text: ="Next"
+        Tooltip: =btnAddNewNext.Tooltip
+        Visible: |-
+            =(GalleryHistoricData.Selected.IsSubmitted && !varViewFullImg) || (FormAddAttendance.Mode = FormMode.View && !varViewFullImg)
+            //When integration is enabled
+            /*If(
+                RadioAttType.Selected.Value = "Use Image",
+                If(
+                    (GalleryHistoricData.Selected.IsSubmitted && !varViewFullImg) || (FormAddAttendance.Mode = FormMode.View && !varViewFullImg),
+                    true,
+                    false
+                ),
+                RadioAttType.Selected.Value = "Use Attendance App",
+                If(
+                    GalleryHistoricData.Selected.IsSubmitted || CountIf(
+                        collAttendees,
+                        true
+                    ) > 0 && !varViewFullImg,
+                    true,
+                    false
+                )
+            )*/
+        Width: =btnAddNewBack.Width
+        X: =Parent.Width - Self.Width - 50
+        Y: =FormAddAttendance.Y + FormAddAttendance.Height + 50
+        ZIndex: =16
+
+    IconAttendanceHome As icon.Home:
+        Color: =IconAddNew.Color
+        Height: =IconAddNew.Height
+        Icon: =Icon.Home
+        OnSelect: =Navigate(ScreenHome,ScreenTransition.Cover)
+        Tooltip: =IconAddNewSessionHome.Tooltip
+        Visible: =FormAddNewSession.Mode = FormMode.View
+        Width: =IconAddNew.Width
+        X: =IconAddNewSessionHome.X
+        Y: =IconAddNewSessionHome.Y
+        ZIndex: =17
+

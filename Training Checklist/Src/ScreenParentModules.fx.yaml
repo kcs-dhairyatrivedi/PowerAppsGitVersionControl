@@ -1,0 +1,248 @@
+ScreenParentModules As screen:
+    Fill: =ScreenHome.Fill
+
+    "GalleryParentModules As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        Fill: =GalleryHistoricData.Fill
+        Height: =FormAddNewSession.Height
+        Items: =collParentWithData
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =Min(160, Self.Height - 60)
+        Width: =Parent.Width
+        X: =lblParentModuleScreenTitle.X
+        Y: =lblParentModuleScreenTitle.Y + lblParentModuleScreenTitle.Height
+        ZIndex: =1
+
+        Title2 As label:
+            Height: =115
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =lblProduct.Size
+            Text: =ThisItem.Title
+            VerticalAlign: =VerticalAlign.Top
+            Width: =459
+            X: =12
+            Y: =22
+            ZIndex: =2
+
+        NextArrowParentModule As icon.ChevronRight:
+            AccessibleLabel: =Self.Tooltip
+            Color: =NextArrow1.Color
+            Height: =IconAddNew.Height
+            Icon: =Icon.ChevronRight
+            OnSelect: |-
+                =Navigate(
+                    ScreenSubModule,
+                    ScreenTransition.Cover
+                );
+                Set(varModuleRemarks, GalleryParentModules.Selected.Remarks);
+                If(
+                    GalleryParentModules.Selected.IsCompleted,
+                        Set(varGalleryTasksDisplayMode, DisplayMode.View),
+                    Set(varGalleryTasksDisplayMode, "New");
+                    Reset(txtRemarks)
+                );
+                ClearCollect(collSubModulesData, GalleryParentModules.Selected.SubModules);
+                //RemoveIf(collSubTasks,true);
+                Set(varVisibleTitle, false)
+            TabIndex: =0
+            Tooltip: ="View item details"
+            Width: =IconAddNew.Width
+            X: =Parent.TemplateWidth - Self.Width - 10
+            Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+            ZIndex: =4
+
+        Separator2 As rectangle:
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =5
+
+        chkIscompleted As checkbox:
+            CheckboxBorderColor: =NextArrow1.Color
+            Color: =NextArrow1.Color
+            Default: =ThisItem.IsCompleted
+            DisplayMode: =DisplayMode.View
+            Height: =IconAddNew.Height
+            OnSelect: =Select(Parent)
+            Size: =21
+            Text: =""
+            Tooltip: ="IsCompleted?"
+            Width: =IconAddNew.Width
+            X: =NextArrowParentModule.X - NextArrowParentModule.Width - 10
+            Y: =NextArrowParentModule.Y
+            ZIndex: =6
+
+    lblParentModuleScreenTitle As label:
+        Align: =Align.Center
+        Color: =lblHomeScreenTitle.Color
+        Fill: =lblHomeScreenTitle.Fill
+        Height: =lblHomeScreenTitle.Height
+        Size: =lblHomeScreenTitle.Size
+        Text: ="Modules"
+        Width: =640
+        ZIndex: =2
+
+    btnSaveSession As icon.Save:
+        Height: =NextArrow1.Height
+        Icon: =Icon.Save
+        OnSelect: |-
+            =ResetForm(FormSignature);
+            NewForm(FormSignature);
+            Set(IsPenInputVisible, true);
+            Navigate(ScreenSignature, ScreenTransition.Cover);
+            Set(varAddSigScreenTitle, "Add Signature");
+        Visible: |-
+            =/*If(
+                CountRows(collParentWithData) = CountRows(
+                    Filter(
+                        collParentWithData,
+                        IsCompleted = true
+                    )
+                ) && Not(varIsSubmiited),
+                true,
+                false
+            )*/
+            false
+        Width: =NextArrow1.Width
+        X: =lblParentModuleScreenTitle.Width - Self.Width - 10
+        Y: =lblParentModuleScreenTitle.Y + 10
+        ZIndex: =4
+
+    btnNextParentModule As icon.NextArrow:
+        Color: =IconAddNew.Color
+        Height: =NextArrow1.Height
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.NextArrow
+        OnSelect: |-
+            =/*If(
+                varIsSubmiited,
+                Navigate(ScreenSignature,ScreenTransition.Cover);
+                ViewForm(FormSignature);
+                Set(IsPenInputVisible,false);
+                Set(varAddSigScreenTitle,"View Signature");
+                ,
+                ResetForm(FormSignature);
+                NewForm(FormSignature);
+                Set(IsPenInputVisible, true);
+                Navigate(ScreenSignature, ScreenTransition.Cover);
+                Set(varAddSigScreenTitle, "Add Signature");
+            )*/
+            If(
+                varIsSubmiited || Not(IsBlank(GalleryHistoricData.Selected.'Attendance Image')),
+                ViewForm(FormAddAttendance);
+                Set(varAddAttScreenTitle,"View Attendance");
+                ,
+                ResetForm(FormAddAttendance);
+                NewForm(FormAddAttendance);
+                Set(varAddAttScreenTitle, "Add Attendance");
+            );
+            //Clear(collAttendees);
+            //Reset(RadioAttType);
+            Navigate(ScreenAttendance,ScreenTransition.Cover);
+            //Navigate(ScreenAttendance,ScreenTransition.Cover);
+                //ViewForm(FormAddAttendance);
+                //Set(varAddAttScreenTitle,"View Attendance");
+        Visible: |-
+            =/*If(
+                CountRows(collParentWithData) = CountRows(
+                    Filter(
+                        collParentWithData,
+                        IsCompleted = true
+                    )
+                ) || varIsSubmiited,
+                true,
+                false
+            )*/
+            false
+        Width: =NextArrow1.Width
+        X: =btnSaveSession.X
+        Y: =btnSaveSession.Y
+        ZIndex: =5
+
+    btnModuleBack As button:
+        Color: =btnAddNewBack.Color
+        Fill: =btnAddNewBack.Fill
+        FontWeight: =btnAddNewBack.FontWeight
+        Height: =btnAddNewBack.Height
+        OnSelect: |-
+            =ViewForm(FormAddNewSession);
+            If(false , Refresh('Training Session Details');Set(collCurrentItem, First(Filter('Training Session Details', ID = varNewItemID))));
+            Navigate(ScreenAddNewSession, ScreenTransition.Cover);
+        RadiusBottomLeft: =5
+        RadiusBottomRight: =5
+        RadiusTopLeft: =5
+        RadiusTopRight: =5
+        Size: =btnAddNewBack.Size
+        Text: ="Back"
+        Tooltip: =btnAddNewBack.Tooltip
+        Width: =btnAddNewBack.Width
+        X: =GalleryParentModules.X + 50
+        Y: =GalleryParentModules.Y + GalleryParentModules.Height + 50
+        ZIndex: =6
+
+    btnModuleNext As button:
+        Color: =btnAddNewBack.Color
+        Fill: =btnAddNewBack.Fill
+        FontWeight: =btnAddNewBack.FontWeight
+        Height: =btnAddNewBack.Height
+        OnSelect: |-
+            =If(
+                varIsSubmiited || Not(IsBlank(collCurrentItem.'Attendance Image')),
+                ViewForm(FormAddAttendance);
+                Set(varAddAttScreenTitle,"View Attendance");
+                ,
+                ResetForm(FormAddAttendance);
+                NewForm(FormAddAttendance);
+                Set(varAddAttScreenTitle, "Add Attendance");
+            );
+            Navigate(ScreenAttendance,ScreenTransition.Cover);
+        RadiusBottomLeft: =5
+        RadiusBottomRight: =5
+        RadiusTopLeft: =5
+        RadiusTopRight: =5
+        Size: =btnAddNewBack.Size
+        Text: ="Next"
+        Tooltip: =btnAddNewNext.Tooltip
+        Visible: |-
+            =If(
+                CountRows(collParentWithData) = CountRows(
+                    Filter(
+                        collParentWithData,
+                        IsCompleted = true
+                    )
+                ) || varIsSubmiited,
+                true,
+                false
+            )
+        Width: =btnAddNewBack.Width
+        X: =Parent.Width - Self.Width - 50
+        Y: =GalleryParentModules.Y + GalleryParentModules.Height + 50
+        ZIndex: =7
+
+    IconModuleHome As icon.Home:
+        Color: =IconAddNew.Color
+        Height: =IconAddNew.Height
+        Icon: =Icon.Home
+        OnSelect: =Navigate(ScreenHome,ScreenTransition.Cover)
+        Tooltip: =IconAddNewSessionHome.Tooltip
+        Width: =IconAddNew.Width
+        X: =IconAddNewSessionHome.X
+        Y: =IconAddNewSessionHome.Y
+        ZIndex: =8
+
+    IconModuleSave As icon.Save:
+        Color: =IconAddNew.Color
+        Height: =IconAddNew.Height
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.Save
+        Visible: =false
+        Width: =IconAddNew.Width
+        X: =IconSaveNewSession.X
+        Y: =IconSaveNewSession.Y
+        ZIndex: =9
+

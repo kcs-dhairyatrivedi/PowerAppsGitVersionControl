@@ -1,0 +1,54 @@
+App As appinfo:
+    BackEnabled: =false
+    OnStart: |-
+        =Set(
+            varAdminUser,
+            Filter(
+                Admin,
+                AdminUser.Email = User().Email
+            ).AdminUser
+        );
+        If(
+            IsEmpty(varAdminUser),
+            Set(
+                varIsAdminUser,
+                false
+            ),
+            Set(
+                varIsAdminUser,
+                true
+            )
+        );
+        If(
+            varIsAdminUser,
+            ClearCollect(
+                collHistoricData,
+                SortByColumns(
+                    'Training Session Details',
+                    "ID",
+                    SortOrder.Descending
+                )
+            ),
+            ClearCollect(
+                collHistoricData,
+                SortByColumns(
+                    Filter(
+                        'Training Session Details',
+                        'Created By'.Email = User().Email
+                    ),
+                    "ID",
+                    SortOrder.Descending
+                )
+            )
+        );
+        ClearCollect(collUsersList, {Result: "All"});
+        Collect(collUsersList, ForAll(Distinct(ForAll(collHistoricData, {DisplayName: 'Created By'.DisplayName}),DisplayName), {Result: ThisRecord.Value}));
+    StartScreen: =
+
+    Host As hostControl.DefaultHostControlVariant:
+        OnCancel: =false
+        OnEdit: =false
+        OnNew: =false
+        OnSave: =false
+        OnView: =false
+

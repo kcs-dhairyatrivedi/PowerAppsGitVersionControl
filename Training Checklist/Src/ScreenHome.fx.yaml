@@ -1,0 +1,419 @@
+ScreenHome As screen:
+    Fill: =GalleryHistoricData.Fill
+    OnVisible: |-
+        =/*ClearCollect(collHistoricData, SortByColumns(Filter(TrainingSessionDetails, 'Created By'.Email = User().Email),"ID",Descending));*/
+        If(
+            varIsAdminUser,
+            ClearCollect(
+                collHistoricData,
+                SortByColumns(
+                    'Training Session Details',
+                    "ID",
+                    SortOrder.Descending
+                )
+            );
+            ,
+            ClearCollect(
+                collHistoricData,
+                SortByColumns(
+                    Filter(
+                        'Training Session Details',
+                        'Created By'.Email = User().Email
+                    ),
+                    "ID",
+                    SortOrder.Descending
+                )
+            )
+        );
+        ClearCollect(collStatus, {Value: true, Status:"Completed"});
+        Collect(collStatus, {Value: false, Status: "InProgress"});
+
+    "GalleryHistoricData As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =966
+        Items: |-
+            =If(
+                drdpFilterByStatus.Selected.Value = Blank() && drdpFilterByUser.Selected.Result = "All",
+                collHistoricData,
+                If(
+                    drdpFilterByStatus.Selected.Value = Blank() && Not(drdpFilterByUser.Selected.Result = "All"),
+                    Filter(
+                        collHistoricData,
+                        'Created By'.DisplayName = drdpFilterByUser.Selected.Result
+                    ),
+                    If(
+                        Not(drdpFilterByStatus.Selected.Value = Blank()) && drdpFilterByUser.Selected.Result = "All",
+                        Filter(
+                            collHistoricData,
+                            IsSubmitted = drdpFilterByStatus.Selected.Value
+                        ),
+                        If(
+                            Not(drdpFilterByStatus.Selected.Value = Blank()) && Not(drdpFilterByUser.Selected.Result = "All"),
+                            Filter(
+                                collHistoricData,
+                                IsSubmitted = drdpFilterByStatus.Selected.Value && 
+                                'Created By'.DisplayName = drdpFilterByUser.Selected.Result
+                            )
+                        )
+                    )
+                )
+            )
+        Layout: =Layout.Vertical
+        ShowScrollbar: =false
+        TemplatePadding: =0
+        TemplateSize: =lblTitle.Height + lblProduct.Height + lblCreatedBy.Height + lblClientName.Height + 30
+        Visible: =If(CountIf(GalleryHistoricData.AllItems, true) > 0, true, false)
+        Y: =SeparatorFilterGallery.Y + SeparatorFilterGallery.Height + 5
+        ZIndex: =1
+
+        lblTitle As label:
+            Height: =66
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =22
+            Text: =ThisItem.Title
+            Width: =406
+            X: =10
+            Y: =10
+            ZIndex: =1
+
+        lblProduct As label:
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =20
+            Text: =ThisItem.Product.Value
+            Width: =lblTitle.Width
+            X: =lblClientName.X
+            Y: =lblClientName.Y + lblClientName.Height + 5
+            ZIndex: =2
+
+        NextArrow1 As icon.ChevronRight:
+            AccessibleLabel: =Self.Tooltip
+            Color: =lblHomeScreenTitle.Fill
+            Height: =60
+            Icon: =Icon.ChevronRight
+            OnSelect: |-
+                =/*ClearCollect(
+                    collDataToView,
+                    Filter(
+                        TrainingSessionDetails,
+                        ID = GalleryHistoricData.Selected.ID
+                    )
+                );*/
+                ClearCollect(
+                    collParentWithData,
+                    ForAll(
+                        Table(ParseJSON(GalleryHistoricData.Selected.'Module JSON Data')),
+                        {
+                            ID: Text(Value.ID),
+                            Title: Text(Value.Title),
+                            Remarks: Text(Value.Remarks),
+                            IsCompleted: Boolean(Value.IsCompleted),
+                            SubModules: ForAll(
+                                Table(Value.SubModules),
+                                {
+                                    ID: Text(Value.ID),
+                                    Title: Text(Value.Title),
+                                    'Parent Module ID': Text(Value.'Parent Module ID'),
+                                    SubTasks: ForAll(
+                                        Table(Value.SubTasks),
+                                        {
+                                            ID: Value(Value.ID),
+                                            Title: Text(Value.Title),
+                                            'Parent Sub Module ID': Value(Value.'Parent Sub Module ID')
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    )
+                );
+                ClearCollect(collSelectedModules, {});
+                ForAll(collParentWithData, Collect(collSelectedModules, {Value: Title}));
+                RemoveIf(collSelectedModules, Value = Blank());
+                Set(collCurrentItem, GalleryHistoricData.Selected);
+                ViewForm(FormAddNewSession);
+                Set(varIsSubmiited, GalleryHistoricData.Selected.IsSubmitted);
+                Set(varItemTitle, GalleryHistoricData.Selected.Title);
+                Set(varNewItemID, GalleryHistoricData.Selected.ID);
+                Set(varAddNewScreenTitle, "View Session Details");
+                Navigate(ScreenAddNewSession, ScreenTransition.Cover)
+            TabIndex: =0
+            Tooltip: ="View item details"
+            Width: =60
+            X: =560
+            Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+            ZIndex: =3
+
+        Separator1 As rectangle:
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =4
+
+        IconViewPDF As icon.DocumentPDF:
+            Color: =lblHomeScreenTitle.Fill
+            Height: =NextArrow1.Height
+            Icon: =Icon.DocumentPDF
+            OnSelect: |
+                =UpdateContext({varHomeScreenLoaderVisible: true});
+                /*Set(
+                    varFileContent,
+                    'SoftwareSupport:TrainingChecklist-GetAttachmentContent'.Run(GalleryHistoricData.Selected.ID).filecontent
+                );*/
+                Set(
+                    varIsHomeClick,
+                    true
+                );
+                Set(
+                    varAttachmentRelativeURL,
+                    Last(
+                        ForAll(
+                            Split(
+                                First(GalleryHistoricData.Selected.Attachments.AbsoluteUri).AbsoluteUri,
+                                ".com"
+                            ),
+                            {Result: ThisRecord.Value}
+                        )
+                    ).Result
+                );
+                Navigate(
+                    ScreenViewPDF,
+                    ScreenTransition.Cover
+                );
+                UpdateContext({varHomeScreenLoaderVisible: false});
+            Tooltip: ="View PDF"
+            Visible: =If(ThisItem.'Has attachments', true, false)
+            Width: =NextArrow1.Width
+            X: =NextArrow1.X - NextArrow1.Width - 10
+            Y: =NextArrow1.Y
+            ZIndex: =5
+
+        IconInProgress As image:
+            Height: =NextArrow1.Height
+            Image: ='icons8-accept-yellow-100'
+            OnSelect: =Select(Parent)
+            Tooltip: ="InProgress"
+            Visible: =!ThisItem.IsSubmitted
+            Width: =NextArrow1.Width
+            X: =IconCompleted.X
+            Y: =IconCompleted.Y
+            ZIndex: =7
+
+        IconCompleted As image:
+            Height: =NextArrow1.Height
+            Image: ='icons8-accept-100'
+            OnSelect: =Select(Parent)
+            Tooltip: ="Completed"
+            Visible: =ThisItem.IsSubmitted
+            Width: =NextArrow1.Width
+            X: =IconViewPDF.X - IconViewPDF.Width - 10
+            Y: =NextArrow1.Y
+            ZIndex: =8
+
+        lblCreatedBy As label:
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =lblProduct.Size
+            Text: =ThisItem.'Created By'.DisplayName
+            Width: =lblTitle.Width
+            X: =lblTitle.X
+            Y: =lblProduct.Y + lblProduct.Height + 5
+            ZIndex: =9
+
+        lblClientName As label:
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =20
+            Text: =ThisItem.ClientName.Value
+            Width: =lblTitle.Width
+            X: =lblTitle.X
+            Y: =lblTitle.Y + lblTitle.Height + 5
+            ZIndex: =10
+
+    lblHomeScreenTitle As label:
+        Align: =Align.Center
+        Color: =RGBA(255, 255, 255, 1)
+        Fill: =RGBA(56, 96, 178, 1)
+        Height: =80
+        Size: =24
+        Text: ="Training Checklist"
+        Width: =640
+        ZIndex: =2
+
+    IconAddNew As icon.Add:
+        Color: =RGBA(255, 255, 255, 1)
+        Height: =NextArrow1.Height
+        Icon: =Icon.Add
+        OnSelect: |-
+            =ResetForm(FormAddNewSession);
+            NewForm(FormAddNewSession);
+            Set(varIsSubmiited, false);
+            Set(collCurrentItem, Blank());
+            Set(varAddNewScreenTitle, "Add New Session");
+            Set(varItemTitle, Blank());
+            RemoveIf(collSelectedModules, true);
+            Navigate(ScreenAddNewSession, ScreenTransition.Cover);
+        Tooltip: ="Add New"
+        Width: =NextArrow1.Width
+        X: =Parent.Width - Self.Width - 10
+        Y: =lblHomeScreenTitle.Y + 10
+        ZIndex: =3
+
+    ContainerHomeScreen As groupContainer.manualLayoutContainer:
+        Fill: =GalleryHistoricData.Fill
+        Height: =63
+        Width: =640
+        Y: =lblHomeScreenTitle.Y + lblHomeScreenTitle.Height + 5
+        ZIndex: =4
+
+        lblFilterStatusTitle As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Bold
+            Height: =62
+            Size: =18
+            Text: ="Status"
+            Width: =87
+            ZIndex: =1
+
+        drdpFilterByStatus As combobox:
+            BorderThickness: =4
+            DisplayFields: =["Status"]
+            Height: =62
+            IsSearchable: =false
+            Items: =collStatus
+            SearchFields: =["Status"]
+            SearchItems: =[]
+            SelectMultiple: =false
+            Size: =lblFilterStatusTitle.Size
+            Tooltip: ="Filter By Status"
+            Width: =222
+            X: =lblFilterStatusTitle.X +lblFilterStatusTitle.Width
+            ZIndex: =3
+
+        drdpFilterByUser As dropdown:
+            BorderStyle: =drdpFilterByStatus.BorderStyle
+            BorderThickness: =drdpFilterByStatus.BorderThickness
+            ChevronBackground: =drdpFilterByStatus.ChevronBackground
+            ChevronDisabledBackground: =drdpFilterByStatus.ChevronDisabledBackground
+            ChevronDisabledFill: =drdpFilterByStatus.ChevronDisabledFill
+            ChevronFill: =drdpFilterByStatus.ChevronFill
+            ChevronHoverBackground: =drdpFilterByStatus.ChevronHoverBackground
+            ChevronHoverFill: =drdpFilterByStatus.ChevronHoverFill
+            Color: =drdpFilterByStatus.Color
+            Default: ="All"
+            DisabledBorderColor: =drdpFilterByStatus.DisabledBorderColor
+            DisabledColor: =drdpFilterByStatus.DisabledColor
+            DisabledFill: =drdpFilterByStatus.DisabledFill
+            Fill: =drdpFilterByStatus.Fill
+            Height: =62
+            HoverFill: =drdpFilterByStatus.HoverFill
+            Items: =collUsersList
+            SelectionFill: =drdpFilterByStatus.SelectionFill
+            Size: =lblFilterStatusTitle.Size
+            Tooltip: ="Filter By User"
+            Visible: =varIsAdminUser
+            Width: =222
+            X: =lblFilterUserTitle.X + lblFilterUserTitle.Width
+            ZIndex: =4
+
+        lblFilterUserTitle As label:
+            Align: =lblFilterStatusTitle.Align
+            Color: =lblFilterStatusTitle.Color
+            FontWeight: =lblFilterStatusTitle.FontWeight
+            Height: =lblFilterStatusTitle.Height
+            Size: =lblFilterStatusTitle.Size
+            Text: ="User"
+            Visible: =varIsAdminUser
+            Width: =lblFilterStatusTitle.Width
+            X: =drdpFilterByStatus.X + drdpFilterByStatus.Width
+            ZIndex: =5
+
+    IconRefresh As icon.Reload:
+        Color: =IconAddNew.Color
+        Height: =NextArrow1.Height
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.Reload
+        OnSelect: |-
+            =/*ClearCollect(collHistoricData, SortByColumns(Filter(TrainingSessionDetails, 'Created By'.Email = User().Email),"ID",Descending))*/
+            If(
+                !varIsAdminUser,
+                ClearCollect(
+                    collHistoricData,
+                    SortByColumns(
+                        Filter(
+                            'Training Session Details',
+                            'Created By'.Email = User().Email
+                        ),
+                        "ID",
+                        SortOrder.Descending
+                    )
+                )
+                /*ClearCollect(
+                    collHistoricData,
+                    SortByColumns(
+                        Filter(
+                            TrainingSessionDetails,
+                            'Created By'.Email = User().Email
+                        );,
+                        "ID",
+                        Descending
+                    )
+                )*/
+                ,
+                ClearCollect(
+                    collHistoricData,
+                    SortByColumns(
+                            'Training Session Details',
+                        "ID",
+                        SortOrder.Descending
+                    )
+                )
+            );
+        Tooltip: ="Reload"
+        Width: =NextArrow1.Width
+        X: =IconAddNew.X - Self.Width - 5
+        Y: =IconAddNew.Y
+        ZIndex: =5
+
+    lblNoItemsMsg As label:
+        Align: =Align.Center
+        Height: =GalleryHistoricData.Height
+        Size: =21
+        Text: ="No Items to Display"
+        Visible: =If(CountIf(GalleryHistoricData.AllItems, true) <= 0, true, false)
+        Width: =GalleryHistoricData.Width
+        X: =GalleryHistoricData.X
+        Y: =GalleryHistoricData.Y
+        ZIndex: =6
+
+    LoaderHome As image:
+        Height: =1136
+        Image: ='Spinner-1s-200px'
+        Visible: =varHomeScreenLoaderVisible
+        Width: =640
+        ZIndex: =7
+
+    SeparatorFilterGallery As rectangle:
+        Height: =1
+        OnSelect: =
+        Width: =Parent.Width
+        Y: =ContainerHomeScreen.Y + ContainerHomeScreen.Height + 5
+        ZIndex: =8
+

@@ -1,0 +1,725 @@
+ScreenSignature As screen:
+    Fill: =ScreenHome.Fill
+    OnVisible: |-
+        =Select(btnClearSignature);
+        UpdateContext({varAuthorizedNameErrorMsg: ""});
+        UpdateContext({varAuthorizedSigErrorMsg: ""});
+        UpdateContext({varAttendanceErrorMsg: ""});
+        UpdateContext({varRemarksErrorMsg: ""});
+        UpdateContext({varIsValiddata: false});
+        UpdateContext({varIsConsent: false});
+        
+        UpdateContext({varPenInputReset:true});
+        UpdateContext({varPenInputReset:false});
+
+    FormSignature As form:
+        DataSource: ='Training Session Details'
+        DefaultMode: =FormMode.New
+        Fill: =GalleryHistoricData.Fill
+        Height: =FormAddNewSession.Height
+        Item: =If(varIsSubmiited,GalleryHistoricData.Selected)
+        Width: =640
+        X: =lblSignatureScreenTitle.X
+        Y: =lblSignatureScreenTitle.Y + lblSignatureScreenTitle.Height
+        ZIndex: =1
+
+        Remarks_DataCard1 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Remarks"
+            Default: =ThisItem.Remarks
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Training Session Details'],DataSourceInfo.DisplayName,"Remarks")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Training Session Details'], DataSourceInfo.MaxLength, "Remarks")
+            Required: =true
+            Update: =txtRemarksSig.Text
+            Width: =640
+            X: =0
+            Y: =1
+            ZIndex: =1
+
+            DataCardKey12 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txtRemarksSig As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =275
+                MaxLength: =Parent.MaxLength
+                Mode: =TextMode.MultiLine
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey12.Y + DataCardKey12.Height + 5
+                ZIndex: =2
+
+            ErrorMessage11 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =24
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txtRemarksSig.Y + txtRemarksSig.Height
+                ZIndex: =3
+
+            StarVisible11 As label:
+                Align: =Align.Center
+                Height: =DataCardKey12.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey12.Y
+                ZIndex: =4
+
+        AuthorizedSignature_DataCard2 As typedDataCard.addLargePictureCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AuthorizedSignature"
+            Default: =ThisItem.'Authorized Signature'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Authorized Signature"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =379
+            Required: =true
+            Update: =ImageSignature.Image
+            Width: =640
+            X: =0
+            Y: =2
+            ZIndex: =1
+
+            DataCardKey2 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            ImageSignature As image:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DisplayMode: =Parent.DisplayMode
+                Height: =PenInput2.Height
+                Image: =If(varIsSubmiited, Parent.Default, PenInput2.Image)
+                Tooltip: =Parent.DisplayName
+                Width: =PenInput2.Width
+                X: =PenInput2.X
+                Y: =PenInput2.Y
+                ZIndex: =2
+
+            AddPicture1 As addMedia:
+                Height: =PenInput2.Height
+                OnSelect: =
+                Visible: =false
+                Width: =PenInput2.Width
+                X: =30
+                Y: =DataCardKey2.Y + DataCardKey2.Height + 5
+                ZIndex: =3
+
+            ErrorMessage2 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =24
+                Text: =varAuthorizedSigErrorMsg
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =ImageSignature.Y + ImageSignature.Height
+                ZIndex: =4
+
+            StarVisible2 As label:
+                Align: =Align.Center
+                Height: =DataCardKey2.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey2.Y
+                ZIndex: =5
+
+            PenInput2 As inkControl:
+                DisplayMode: =Parent.DisplayMode
+                Height: =275
+                Reset: =varPenInputReset
+                Visible: =!varIsSubmiited
+                Width: =580
+                X: =30
+                Y: =58
+                ZIndex: =6
+
+        "'Signature Date Time_DataCard1' As typedDataCard.textualEditCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SignatureDateTime"
+            Default: =ThisItem.'Signature Date Time'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Training Session Details'],DataSourceInfo.DisplayName,"SignatureDateTime")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Training Session Details'], DataSourceInfo.MaxLength, "SignatureDateTime")
+            Required: =false
+            Update: =DataCardValue4.Text
+            Visible: =GalleryHistoricData.Selected.IsSubmitted
+            Width: =640
+            X: =0
+            Y: =3
+            ZIndex: =1
+
+            DataCardKey3 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue4 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: |-
+                    =Concatenate(
+                        Text(
+                            DateValue(Parent.Default),
+                            "dd/mm/yyyy"
+                        ),
+                        " ",
+                        Text(
+                            If(
+                                Mod(
+                                    Hour(Parent.Default),
+                                    12
+                                ) = 0,
+                                Concatenate(
+                                    12,
+                                    ":",
+                                    Text(Minute(Parent.Default))
+                                ),
+                                Concatenate(
+                                    Mod(
+                                        Hour(Parent.Default),
+                                        12
+                                    ),
+                                    ":",
+                                    Text(Minute(Parent.Default))
+                                )
+                            ),
+                            "[$-en-US]00"
+                        ),
+                        If(
+                            Hour(Parent.Default) < 12,
+                            " AM",
+                            " PM"
+                        )
+                    )
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey3.Y + DataCardKey3.Height + 5
+                ZIndex: =2
+
+            ErrorMessage3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =24
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue4.Y + DataCardValue4.Height
+                ZIndex: =3
+
+            StarVisible3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey3.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey3.Y
+                ZIndex: =4
+
+        AuthorizedName_DataCard1 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AuthorizedName"
+            Default: =ThisItem.'Authorized Name'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Authorized Name"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Training Session Details'], DataSourceInfo.MaxLength, "AuthorizedName")
+            Required: =true
+            Update: =txtAuthorizedName.Text
+            Width: =640
+            X: =0
+            Y: =0
+            ZIndex: =2
+
+            DataCardKey4 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txtAuthorizedName As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                MaxLength: =Parent.MaxLength
+                OnSelect: =
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey4.Y + DataCardKey4.Height + 5
+                ZIndex: =2
+
+            ErrorMessage4 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =24
+                Text: =varAuthorizedNameErrorMsg
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txtAuthorizedName.Y + txtAuthorizedName.Height
+                ZIndex: =3
+
+            StarVisible4 As label:
+                Align: =Align.Center
+                Height: =DataCardKey4.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey4.Y
+                ZIndex: =4
+
+    lblSignatureScreenTitle As label:
+        Align: =Align.Center
+        Color: =lblHomeScreenTitle.Color
+        Fill: =lblHomeScreenTitle.Fill
+        Height: =lblHomeScreenTitle.Height
+        Size: =lblHomeScreenTitle.Size
+        Text: =varAddSigScreenTitle
+        Width: =640
+        ZIndex: =2
+
+    IconSaveSignature As icon.Save:
+        Height: =NextArrow1.Height
+        Icon: =Icon.Save
+        OnSelect: |-
+            =UpdateContext({varIsContainerVisible: true});
+            /*If(
+                txtAuthorizedName.Text = Blank(),
+                UpdateContext({varAuthorizedNameErrorMsg: "Athorized Name Is Required"});
+                UpdateContext({varIsValiddata: false})
+            );
+            If(
+                Len(
+                    JSON(
+                        PenInput2.Image,
+                        IncludeBinaryData
+                    )
+                ) <= 3756,
+                UpdateContext({varAuthorizedSigErrorMsg: "Athorized Signature Is Required"});
+                UpdateContext({varIsValiddata: false})
+            );
+            If(
+                Len(
+                    JSON(
+                        PenInput2.Image,
+                        IncludeBinaryData
+                    )
+                ) <= 5300,
+                UpdateContext({varAuthorizedSigErrorMsg: "Provide Valid Athorized Signature"});
+                UpdateContext({varIsValiddata: false})
+            );
+            If(
+                AttendanceImage.Image = Blank(),
+                UpdateContext({varAttendanceErrorMsg: "Image of Attendance Sheet Required"});
+                UpdateContext({varIsValiddata: false})
+            );
+            If(
+                Not(txtAuthorizedName.Text = Blank()) && Not(
+                    Len(
+                        JSON(
+                            PenInput2.Image,
+                            IncludeBinaryData
+                        )
+                    ) <= 3756
+                ) && Not(
+                    Len(
+                        JSON(
+                            PenInput2.Image,
+                            IncludeBinaryData
+                        )
+                    ) <= 5300
+                ),
+                UpdateContext({varIsValiddata: true})
+            );*/
+        Visible: |-
+            =//If(Not(varIsSubmiited), true, false)
+            false
+        Width: =NextArrow1.Width
+        X: =lblSignatureScreenTitle.Width - Self.Width - 10
+        Y: =lblSignatureScreenTitle.Y + 10
+        ZIndex: =3
+
+    btnClearSignature As button:
+        AutoDisableOnSelect: =false
+        Height: =70
+        OnSelect: |-
+            =Set(flag, true);
+            UpdateContext({varPenInputReset:true});
+            UpdateContext({varPenInputReset:false});
+        Size: =24
+        Text: ="Button"
+        Visible: =false
+        Width: =280
+        X: =263
+        Y: =1005
+        ZIndex: =4
+
+    IconViewPDFSigPage As icon.DocumentPDF:
+        Color: =IconAddNew.Color
+        Height: =NextArrow1.Height
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.DocumentPDF
+        OnSelect: |
+            =UpdateContext({varSigFormLoaderVisible: true});
+            /*Set(varFileContent,'SoftwareSupport:TrainingChecklist-GetAttachmentContent'.Run(GalleryHistoricData.Selected.ID).filecontent);*/
+            Set(varIsHomeClick, false);
+            Set(
+                varAttachmentRelativeURL,
+                Last(
+                    ForAll(
+                        Split(
+                            First(GalleryHistoricData.Selected.Attachments.AbsoluteUri).AbsoluteUri,
+                            ".com"
+                        ),
+                        {Result: ThisRecord.Value}
+                    )
+                ).Result
+            );
+            Navigate(
+                ScreenViewPDF,
+                ScreenTransition.Cover
+            );
+            UpdateContext({varSigFormLoaderVisible: false});
+        Tooltip: ="View PDF"
+        Visible: =If(varIsSubmiited && GalleryHistoricData.Selected.'Has attachments', true, false)
+        Width: =NextArrow1.Width
+        X: =IconSaveSignature.X
+        Y: =IconSaveSignature.Y
+        ZIndex: =5
+
+    btnSignatureSubmit As button:
+        Color: =btnAddNewBack.Color
+        Fill: =btnAddNewBack.Fill
+        FontWeight: =btnAddNewBack.FontWeight
+        Height: =btnAddNewBack.Height
+        OnSelect: |
+            =UpdateContext({varIsContainerVisible: true});
+        Size: =btnAddNewBack.Size
+        Text: ="Submit"
+        Tooltip: ="Submit"
+        Visible: =If(Not(varIsSubmiited), true, false)
+        Width: =btnAddNewBack.Width
+        X: =437
+        Y: =FormSignature.Y +FormSignature.Height + 50
+        ZIndex: =6
+
+    IconSignatureHome As icon.Home:
+        Color: =IconAddNew.Color
+        Height: =IconAddNew.Height
+        Icon: =Icon.Home
+        OnSelect: =Navigate(ScreenHome,ScreenTransition.Cover)
+        Tooltip: =IconAddNewSessionHome.Tooltip
+        Width: =IconAddNew.Width
+        X: =IconAddNewSessionHome.X
+        Y: =IconAddNewSessionHome.Y
+        ZIndex: =7
+
+    btnSignatureBack As button:
+        Color: =btnAddNewBack.Color
+        Fill: =btnAddNewBack.Fill
+        FontWeight: =btnAddNewBack.FontWeight
+        Height: =btnAddNewBack.Height
+        OnSelect: |-
+            =Set(varPenInputReset, false);
+            Navigate(ScreenAttendance, ScreenTransition.Cover);
+        RadiusBottomLeft: =5
+        RadiusBottomRight: =5
+        RadiusTopLeft: =5
+        RadiusTopRight: =5
+        Size: =btnAddNewBack.Size
+        Text: ="Back"
+        Tooltip: =btnAddNewBack.Tooltip
+        Width: =btnAddNewBack.Width
+        X: =FormSignature.X + 50
+        Y: =FormSignature.Y + FormSignature.Height + 50
+        ZIndex: =8
+
+    sigFromLoader As image:
+        Height: =1136
+        Image: ='Spinner-1s-200px'
+        Visible: =varSigFormLoaderVisible
+        Width: =640
+        ZIndex: =9
+
+    ContainerSigScreenConsent As groupContainer.manualLayoutContainer:
+        BorderColor: =RGBA(56, 96, 178, 1)
+        Fill: =RGBA(149, 149, 149, 0.8)
+        Height: =1136
+        Visible: =varIsContainerVisible
+        Width: =640
+        ZIndex: =11
+
+        GroupSigAlert As group:
+            Height: =5
+            Width: =5
+            X: =40
+            Y: =40
+            ZIndex: =6
+
+            txtControlContainer As text:
+                Default: =""
+                DisplayMode: =DisplayMode.View
+                Height: =360
+                RadiusBottomLeft: =20
+                RadiusBottomRight: =20
+                RadiusTopLeft: =20
+                RadiusTopRight: =20
+                Size: =21
+                Width: =570
+                X: =(Parent.Width/2) - (Self.Width/2)
+                Y: =(Parent.Height/2)-(Self.Height/2)
+                ZIndex: =1
+
+            lblSigMsg As label:
+                Align: =Align.Center
+                Fill: =RGBA(255, 255, 255, 1)
+                Height: =txtControlContainer.Height - lblSigMsgTitle.Height - btnSigYes.Height - 30
+                Size: =lblProduct.Size
+                Text: |-
+                    ="You are going to submit this session, after submitting you will not able to edit remarks. 
+                    Do you still want to Submit?"
+                Width: =txtControlContainer.Width - 20
+                X: =lblSigMsgTitle.X
+                Y: =lblSigMsgTitle.Y + lblSigMsgTitle.Height
+                ZIndex: =2
+
+            lblSigMsgTitle As label:
+                Align: =Align.Center
+                DisabledColor: =RGBA(26, 26, 26, 1)
+                Fill: =lblSigMsg.Fill
+                FontWeight: =FontWeight.Bold
+                Height: =70
+                Size: =21
+                Text: ="Alert"
+                Width: =txtControlContainer.Width - 20
+                X: =txtControlContainer.X + 10
+                Y: =txtControlContainer.Y + 10
+                ZIndex: =3
+
+            btnSigYes As button:
+                Color: =btnAddNewBack.Color
+                Fill: =btnAddNewBack.Fill
+                FontWeight: =btnAddNewBack.FontWeight
+                Height: =btnAddNewBack.Height
+                OnSelect: |-
+                    =UpdateContext({varIsConsent: true});
+                    UpdateContext({varIsContainerVisible: false});
+                    UpdateContext({varAuthorizedNameErrorMsg: ""});
+                    UpdateContext({varAuthorizedSigErrorMsg: ""});
+                    UpdateContext({varRemarksErrorMsg: ""});
+                    UpdateContext({varAttendanceErrorMsg: ""});
+                    UpdateContext({varIsValiddata: false});
+                    If(
+                        varIsConsent,
+                        If(
+                            txtAuthorizedName.Text = Blank() || txtAuthorizedName.Text = "" || txtAuthorizedName.Text = " ",
+                            UpdateContext({varAuthorizedNameErrorMsg: "Athorized Name Is Required"});
+                            UpdateContext({varIsValiddata: false})
+                        );
+                        If(
+                            txtRemarksSig.Text = Blank() || txtRemarksSig.Text = "" || txtRemarksSig.Text = " ",
+                            UpdateContext({varRemarksErrorMsg: "Remarks Is Required"});
+                            UpdateContext({varIsValiddata: false})
+                        );
+                        If(
+                            Len(
+                                JSON(
+                                    PenInput2.Image,
+                                    JSONFormat.IncludeBinaryData
+                                )
+                            ) <= 3756,
+                            UpdateContext({varAuthorizedSigErrorMsg: "Athorized Signature Is Required"});
+                            UpdateContext({varIsValiddata: false})
+                        );
+                        If(
+                            Len(
+                                JSON(
+                                    PenInput2.Image,
+                                    JSONFormat.IncludeBinaryData
+                                )
+                            ) <= 5300,
+                            UpdateContext({varAuthorizedSigErrorMsg: "Provide Valid Athorized Signature"});
+                            UpdateContext({varIsValiddata: false})
+                        );
+                        If(
+                            Not(txtAuthorizedName.Text = Blank()) && Not(txtAuthorizedName.Text = "") && Not(txtAuthorizedName.Text = " ") && Not(txtRemarksSig.Text = Blank()) && Not(txtRemarksSig.Text = "") && Not(txtRemarksSig.Text = " ") && Not(
+                                Len(
+                                    JSON(
+                                        PenInput2.Image,
+                                        JSONFormat.IncludeBinaryData
+                                    )
+                                ) <= 3756
+                            ) && Not(
+                                Len(
+                                    JSON(
+                                        PenInput2.Image,
+                                        JSONFormat.IncludeBinaryData
+                                    )
+                                ) <= 5300
+                            ),
+                            UpdateContext({varIsValiddata: true})
+                        );
+                        
+                    );
+                    If(
+                        varIsValiddata,
+                        UpdateContext({varSigFormLoaderVisible: true});
+                        Patch(
+                            'Training Session Details',
+                            First(
+                                Filter(
+                                    'Training Session Details',
+                                    ID = varNewItemID
+                                )
+                            ),
+                            {
+                                'Authorized Name': txtAuthorizedName.Text,
+                                'Authorized Signature': ImageSignature.Image,
+                                Remarks: txtRemarksSig.Text,
+                                IsSubmitted: true,
+                                'Signature Date Time': Now(),
+                                'Session End Date Time': Now()
+                            }
+                        );
+                        'SoftwareSupport:TrainingChecklist-CreateandSavePdftoSharePointitem'.Run(varNewItemID);
+                        Navigate(
+                            ScreenHome,
+                            ScreenTransition.Cover
+                        ),
+                        If(
+                            varIsValiddata = false,
+                            Notify(
+                                "Please fill all mandatory fields and try again",
+                                NotificationType.Error,
+                                2000
+                            )
+                        )
+                    );
+                    UpdateContext({varSigFormLoaderVisible: false});
+                Size: =btnAddNewBack.Size
+                Text: ="Yes"
+                Tooltip: ="Yes"
+                Underline: =true
+                Width: =btnAddNewBack.Width
+                X: =(lblSigMsg.X/2) + (Self.Width/2)
+                Y: =lblSigMsg.Y + lblSigMsg.Height + 10
+                ZIndex: =4
+
+            btnSigNo As button:
+                Color: =btnAddNewBack.Color
+                Fill: =ColorFade(btnSigYes.Fill, 20%)
+                FontWeight: =btnAddNewBack.FontWeight
+                Height: =btnAddNewBack.Height
+                OnSelect: |-
+                    =UpdateContext({varIsConsent: false});
+                    UpdateContext({varIsContainerVisible: false});
+                Size: =btnAddNewBack.Size
+                Text: ="No"
+                Tooltip: ="No"
+                Width: =btnAddNewBack.Width
+                X: =(lblSigMsg.Width/2) + (Self.Width/1.25)
+                Y: =btnSigYes.Y
+                ZIndex: =5
+

@@ -1,0 +1,1493 @@
+ScreenAddNewSession As screen:
+    Fill: =ScreenHome.Fill
+    LoadingSpinner: =LoadingSpinner.Data
+    OnVisible: |-
+        =UpdateContext({varTitleErrorMsg: ""});
+        UpdateContext({varClientnameErrorMsg: ""});
+        UpdateContext({varSessionTypeErrorMsg: ""});
+        UpdateContext({varProductErrorMsg: ""});
+        UpdateContext({varModuleErrorMsg: ""});
+        UpdateContext({varIsValiddata: false});
+        UpdateContext({collModules: Blank()});
+        UpdateContext({varIsConsent: false});
+        Set(
+            varSelectedModules,
+            Blank()
+        );
+        If(
+            FormAddNewSession.Mode = FormMode.View,
+            Set(
+                varSelectedModules,
+                Concat(
+                    collSelectedModules,
+                    Concatenate(
+                        Value,
+                        If(
+                            Not(
+                                CountIf(
+                                    collSelectedModules,
+                                    true
+                                ) = CountIf(
+                                    ForAll(Split(
+                                        varSelectedModules,
+                                        ","
+                                    ), {Result: ThisRecord.Value}),
+                                    true
+                                )
+                            ),
+                            ", "
+                        ),
+                        lblModules
+                    )
+                )
+            )
+        );
+
+    FormAddNewSession As form:
+        AcceptsFocus: =false
+        DataSource: ='Training Session Details'
+        DefaultMode: =FormMode.New
+        Fill: =GalleryHistoricData.Fill
+        Height: =906
+        Item: =collCurrentItem
+        Width: =Parent.Width
+        X: =lblAddNewScreenTitle.X
+        Y: =lblAddNewScreenTitle.Y + lblAddNewScreenTitle.Height
+        ZIndex: =1
+
+        ClientName_DataCard1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ClientName"
+            Default: =ThisItem.ClientName
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Training Session Details'],DataSourceInfo.DisplayName,"ClientName")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =true
+            Update: =drdpClient.Selected
+            Width: =640
+            X: =0
+            Y: =1
+            ZIndex: =1
+
+            DataCardKey13 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drdpClient As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                IsSearchable: =false
+                Items: =Choices([@'Training Session Details'].ClientName)
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =21
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey13.Y + DataCardKey13.Height + 5
+                ZIndex: =2
+
+            ErrorMessage12 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =24
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drdpClient.Y + drdpClient.Height
+                ZIndex: =3
+
+            StarVisible12 As label:
+                Align: =Align.Center
+                Height: =DataCardKey13.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey13.Y
+                ZIndex: =4
+
+        SessionType_DataCard1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SessionType"
+            Default: =ThisItem.'Session Type'
+            DisplayMode: =If(FormAddNewSession.Mode = FormMode.New || FormAddNewSession.Mode = FormMode.View, Parent.DisplayMode, DisplayMode.View)
+            DisplayName: ="Session Type"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =true
+            Update: =drdpSessionType.Selected
+            Width: =640
+            X: =0
+            Y: =2
+            ZIndex: =1
+
+            DataCardKey9 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drdpSessionType As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                ChevronHoverFill: =drdpFilterByStatus.ChevronHoverFill
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                InputTextPlaceholder: ="Search Client"
+                IsSearchable: =false
+                Items: =Choices([@'Training Session Details'].'Session Type')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey9.Y + DataCardKey9.Height + 5
+                ZIndex: =2
+
+            ErrorMessage9 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =lblProduct.Size
+                Text: =varSessionTypeErrorMsg
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drdpSessionType.Y + drdpSessionType.Height
+                ZIndex: =3
+
+            StarVisible9 As label:
+                Align: =Align.Center
+                Height: =DataCardKey9.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey9.Y
+                ZIndex: =4
+
+        DataCardProduct As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Product"
+            DisplayMode: =If(FormAddNewSession.Mode = FormMode.New || FormAddNewSession.Mode = FormMode.View, Parent.DisplayMode, DisplayMode.View)
+            DisplayName: =DataSourceInfo([@'Training Session Details'],DataSourceInfo.DisplayName,"Product")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =true
+            Width: =640
+            X: =0
+            Y: =3
+            ZIndex: =1
+
+            DataCardKey9_1 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drdpProduct As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                ChevronHoverFill: =drdpFilterByStatus.ChevronHoverFill
+                DefaultSelectedItems: =collCurrentItem.Product
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                IsSearchable: =false
+                Items: =Choices([@'Training Session Details'].Product)
+                OnChange: |-
+                    =//ClearCollect(collModules, Filter('Training Module Master', ProductID = drdpProduct.Selected.Id));
+                    Reset(drdpModules)
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =69
+                ZIndex: =2
+
+            ErrorMessage9_1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =lblProduct.Size
+                Text: =varProductErrorMsg
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drdpProduct.Y + drdpProduct.Height
+                ZIndex: =3
+
+            StarVisible9_1 As label:
+                Align: =Align.Center
+                Height: =DataCardKey9_1.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey9_1.Y
+                ZIndex: =4
+
+        DataCardModules As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: =""
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Select Modules"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =true
+            Width: =640
+            X: =0
+            Y: =4
+            ZIndex: =1
+
+            DataCardKey9_2 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drdpModules As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                ChevronHoverFill: =drdpFilterByStatus.ChevronHoverFill
+                DefaultSelectedItems: =//If(FormAddNewSession.Mode = FormMode.View,collSelectedModules)
+                DisplayFields: =["Title"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                IsSearchable: =false
+                Items: =Filter('Training Module Master', ProductID = drdpProduct.Selected.Id)
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Title"]
+                SearchItems: =[]
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Visible: =FormAddNewSession.Mode = FormMode.New
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =58
+                ZIndex: =2
+
+            ErrorMessage9_2 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =lblProduct.Size
+                Text: =varModuleErrorMsg
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drdpModules.Y + drdpModules.Height
+                ZIndex: =3
+
+            StarVisible9_2 As label:
+                Align: =Align.Center
+                Height: =DataCardKey9_2.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey9_2.Y
+                ZIndex: =4
+
+            lblModules As label:
+                AutoHeight: =true
+                DisplayMode: =DisplayMode.View
+                Height: =70
+                Size: =lblProduct.Size
+                Text: |-
+                    =//Replace(varSelectedModules, Value(Len(varSelectedModules) -1), 1, "")
+                    varSelectedModules
+                Visible: =FormAddNewSession.Mode = FormMode.View || FormAddNewSession.Mode = FormMode.Edit
+                Width: =560
+                X: =drdpModules.X
+                Y: =drdpModules.Y
+                ZIndex: =5
+
+        SessionStartDate_DataCard1 As typedDataCard.dateTimeEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SessionStartDate"
+            Default: =ThisItem.'Session Start Date Time'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Session Start Date"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: |-
+                =//DateValue2.SelectedDate + Time(Value(HourValue2.Selected.Value), Value(MinuteValue2.Selected.Value), 0)
+                DateValue2.SelectedDate + Time(If(drdpSDateAMPMValue.Selected.Value = "PM", 12, 0) + Mod(Value(HourValue2.Selected.Value), 12), Value(MinuteValue2.Selected.Value), 0)
+            Visible: =FormAddNewSession.Mode =  FormMode.View
+            Width: =640
+            X: =0
+            Y: =5
+            ZIndex: =1
+
+            DataCardKey6 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DateValue2 As datepicker:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultDate: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                EndYear: =Year(Today())+100
+                Format: ="dd/mm/yyyy"
+                Height: =70
+                IsEditable: =true
+                PaddingBottom: =0
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                Size: =lblProduct.Size
+                StartYear: =1899
+                Tooltip: =Parent.DisplayName
+                Width: =(Parent.Width - 60) / 2
+                X: =30
+                Y: =DataCardKey6.Y + DataCardKey6.Height + 5
+                ZIndex: =2
+
+            HourValue2 As dropdown:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Text(If(Mod(Hour(Parent.Default),12) = 0, 12, Mod(Hour(Parent.Default), 12)), "[$-en-US]00")
+                DisplayMode: =Parent.DisplayMode
+                Height: =DateValue2.Height
+                Items: =["00","01","02","03","04","05","06","07","08","09","10","11","12"]
+                PaddingBottom: =5
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                PaddingRight: =5
+                PaddingTop: =5
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =86
+                X: =DateValue2.X + DateValue2.Width + 10
+                Y: =DateValue2.Y
+                ZIndex: =3
+
+            Separator5 As label:
+                Align: =Align.Center
+                FontWeight: =FontWeight.Bold
+                Height: =HourValue2.Height
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =21
+                Text: |-
+                    =":"
+                Width: =10
+                Wrap: =false
+                X: =HourValue2.X + HourValue2.Width
+                Y: =HourValue2.Y
+                ZIndex: =4
+
+            MinuteValue2 As dropdown:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Text(Minute(Parent.Default),"00")
+                DisplayMode: =Parent.DisplayMode
+                Height: =HourValue2.Height
+                Items: =["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59"]
+                PaddingBottom: =5
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                PaddingRight: =5
+                PaddingTop: =5
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =HourValue2.Width
+                X: =HourValue2.X + HourValue2.Width + Separator5.Width
+                Y: =HourValue2.Y
+                ZIndex: =5
+
+            ErrorMessage6 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =lblProduct.Size
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =HourValue2.Y + HourValue2.Height
+                ZIndex: =6
+
+            StarVisible6 As label:
+                Align: =Align.Center
+                Height: =DataCardKey6.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey6.Y
+                ZIndex: =7
+
+            drdpSDateAMPMValue As dropdown:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =If(Hour(Parent.Default) < 12, "[$-en-US]AM", "PM")
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                Items: =["AM", "PM"]
+                Size: =lblProduct.Size
+                Width: =88
+                X: =522
+                Y: =63
+                ZIndex: =8
+
+        SessionEndDate_DataCard1 As typedDataCard.dateTimeEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SessionEndDate"
+            Default: =ThisItem.'Session End Date Time'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Session End Date"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DateValue1.SelectedDate + Time(If(drdpEDateAMPMValue.Selected.Value = "PM", 12, 0) + Mod(Value(HourValue1.Selected.Value), 12), Value(MinuteValue1.Selected.Value), 0)
+            Visible: =FormAddNewSession.Mode = FormMode.View
+            Width: =640
+            X: =0
+            Y: =6
+            ZIndex: =1
+
+            DataCardKey5 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DateValue1 As datepicker:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultDate: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                EndYear: =Year(Today())+100
+                Format: ="dd/mm/yyyy"
+                Height: =70
+                IsEditable: =true
+                PaddingBottom: =0
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                Size: =lblProduct.Size
+                StartYear: =1899
+                Tooltip: =Parent.DisplayName
+                Width: =(Parent.Width - 60) / 2
+                X: =30
+                Y: =DataCardKey5.Y + DataCardKey5.Height + 5
+                ZIndex: =2
+
+            HourValue1 As dropdown:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: |-
+                    =//Text(Hour(Parent.Default),"00")
+                    If(Not(Parent.Default= Blank()), Text(If(Mod(Hour(Parent.Default),12) = 0, 12, Mod(Hour(Parent.Default), 12)), "[$-en-US]00"), 00)
+                DisplayMode: =Parent.DisplayMode
+                Height: =DateValue1.Height
+                Items: =["00","01","02","03","04","05","06","07","08","09","10","11","12"]
+                PaddingBottom: =5
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                PaddingRight: =5
+                PaddingTop: =5
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =86
+                X: =DateValue1.X + DateValue1.Width + 10
+                Y: =DateValue1.Y
+                ZIndex: =3
+
+            Separator4 As label:
+                Align: =Align.Center
+                FontWeight: =FontWeight.Bold
+                Height: =HourValue1.Height
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =21
+                Text: |-
+                    =":"
+                Width: =10
+                Wrap: =false
+                X: =HourValue1.X + HourValue1.Width
+                Y: =HourValue1.Y
+                ZIndex: =4
+
+            MinuteValue1 As dropdown:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =If(Not(Parent.Default= Blank()), Text(Minute(Parent.Default),"00"), 00)
+                DisplayMode: =Parent.DisplayMode
+                Height: =HourValue1.Height
+                Items: =["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59"]
+                PaddingBottom: =5
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                PaddingRight: =5
+                PaddingTop: =5
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =HourValue1.Width
+                X: =HourValue1.X + HourValue1.Width + Separator4.Width
+                Y: =HourValue1.Y
+                ZIndex: =5
+
+            ErrorMessage5 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =lblProduct.Size
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =HourValue1.Y + HourValue1.Height
+                ZIndex: =6
+
+            StarVisible5 As label:
+                Align: =Align.Center
+                Height: =DataCardKey5.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey5.Y
+                ZIndex: =7
+
+            drdpEDateAMPMValue As dropdown:
+                Default: =If(Not(Parent.Default = Blank()), If(Hour(Parent.Default) < 12, "[$-en-US]AM", "PM"), " ")
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                Items: =["AM", "PM", " "]
+                Size: =lblProduct.Size
+                Width: =88
+                X: =522
+                Y: =63
+                ZIndex: =8
+
+        SessionTakenBy_DataCard1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SessionTakenBy"
+            Default: =ThisItem.'Session Taken By'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Session Taken By"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue1.Selected
+            Visible: =FormAddNewSession.Mode = FormMode.View
+            Width: =640
+            X: =0
+            Y: =7
+            ZIndex: =1
+
+            DataCardKey7 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue1 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["DisplayName","Email","Picture"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                IsSearchable: =false
+                Items: =Choices([@'Training Session Details'].'Session Taken By')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["DisplayName"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =lblProduct.Size
+                Template: =ListItemTemplate.Person
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey7.Y + DataCardKey7.Height + 5
+                ZIndex: =2
+
+            ErrorMessage7 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =lblProduct.Size
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue1.Y + DataCardValue1.Height
+                ZIndex: =3
+
+            StarVisible7 As label:
+                Align: =Align.Center
+                Height: =DataCardKey7.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey7.Y
+                ZIndex: =4
+
+        IsSubmitted_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="IsSubmitted"
+            Default: =ThisItem.IsSubmitted
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Is Submitted?"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue2.Value
+            Visible: =FormAddNewSession.Mode = FormMode.View
+            Width: =640
+            X: =0
+            Y: =8
+            ZIndex: =1
+
+            DataCardKey8 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue2 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                FalseFill: =RGBA(255, 0, 0, 1)
+                FalseText: ="No"
+                Height: =49
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                TrueFill: =RGBA(54, 176, 75, 1)
+                TrueText: ="Yes"
+                Width: =154
+                X: =30
+                Y: =DataCardKey8.Y + DataCardKey8.Height + 5
+                ZIndex: =2
+
+            ErrorMessage8 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =lblProduct.Size
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue2.Y + DataCardValue2.Height
+                ZIndex: =3
+
+            StarVisible8 As label:
+                Align: =Align.Center
+                Height: =DataCardKey8.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey8.Y
+                ZIndex: =4
+
+        Created_DataCard1 As typedDataCard.textualViewCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Created"
+            Default: =ThisItem.Created
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Training Session Details'],DataSourceInfo.DisplayName,"Created")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            Required: =false
+            Visible: =FormAddNewSession.Mode = FormMode.View
+            Width: =640
+            X: =0
+            Y: =9
+            ZIndex: =1
+
+            DataCardKey10 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: ="Session Creation Date"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue3 As label:
+                AutoHeight: =true
+                DisplayMode: =Parent.DisplayMode
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =lblProduct.Size
+                Text: |-
+                    =Concatenate(
+                        Text(
+                            DateValue(Parent.Default),
+                            "dd/mm/yyyy"
+                        ),
+                        " ",
+                        Text(
+                            If(
+                                Mod(
+                                    Hour(Parent.Default),
+                                    12
+                                ) = 0,
+                                Concatenate(
+                                    12,
+                                    ":",
+                                    Text(Minute(Parent.Default))
+                                ),
+                                Concatenate(
+                                    Mod(
+                                        Hour(Parent.Default),
+                                        12
+                                    ),
+                                    ":",
+                                    Text(Minute(Parent.Default))
+                                )
+                            ),
+                            "[$-en-US]00"
+                        ),
+                        If(
+                            Hour(Parent.Default) < 12,
+                            " AM",
+                            " PM"
+                        )
+                    )
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey10.Y + DataCardKey10.Height + 5
+                ZIndex: =2
+
+        Title_DataCard1 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Title"
+            Default: =ThisItem.Title
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Training Session Details'],DataSourceInfo.DisplayName,"Title")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Training Session Details'], DataSourceInfo.MaxLength, "Title")
+            Required: =true
+            Update: =txtTitle.Text
+            Width: =640
+            X: =0
+            Y: =0
+            ZIndex: =2
+
+            DataCardKey1 As label:
+                AutoHeight: =true
+                Color: =lblTitle.Color
+                FontWeight: =lblTitle.FontWeight
+                Height: =48
+                Size: =lblProduct.Size
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txtTitle As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =70
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =lblProduct.Size
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey1.Y + DataCardKey1.Height + 5
+                ZIndex: =2
+
+            ErrorMessage1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =lblProduct.Size
+                Text: =varTitleErrorMsg
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txtTitle.Y + txtTitle.Height
+                ZIndex: =3
+
+            StarVisible1 As label:
+                Align: =Align.Center
+                Height: =DataCardKey1.Height
+                Size: =21
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey1.Y
+                ZIndex: =4
+
+    lblAddNewScreenTitle As label:
+        Align: =Align.Center
+        Color: =lblHomeScreenTitle.Color
+        Fill: =lblHomeScreenTitle.Fill
+        Height: =lblHomeScreenTitle.Height
+        Size: =lblHomeScreenTitle.Size
+        Text: =varAddNewScreenTitle
+        Width: =640
+        ZIndex: =2
+
+    IconSaveNewSession As icon.Save:
+        Color: =IconAddNew.Color
+        Height: =NextArrow1.Height
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.Save
+        OnSelect: |-
+            =UpdateContext({varIsContainerVisible: true})
+        Visible: |-
+            =FormAddNewSession.Mode = FormMode.New || FormAddNewSession.Mode = FormMode.Edit
+            //If(Not(varIsSubmiited) && varItemTitle = Blank(), true, false)
+        Width: =NextArrow1.Width
+        X: =lblAddNewScreenTitle.Width - Self.Width - 10
+        Y: =lblAddNewScreenTitle.Y + 10
+        ZIndex: =3
+
+    IconAddNewSessionCancel As icon.Cancel:
+        Color: =IconAddNew.Color
+        Height: =NextArrow1.Height
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.Cancel
+        OnSelect: |
+            =If(
+                FormAddNewSession.Mode = FormMode.Edit,
+                ViewForm(FormAddNewSession),
+                If(
+                    FormAddNewSession.Mode = FormMode.New,
+                    Navigate(
+                        ScreenHome,
+                        ScreenTransition.Cover
+                    )
+                )
+            );
+        Visible: =FormAddNewSession.Mode = FormMode.Edit || FormAddNewSession.Mode = FormMode.New
+        Width: =NextArrow1.Width
+        X: =IconAddNewSessionHome.X
+        Y: =IconAddNewSessionHome.Y
+        ZIndex: =4
+
+    ImgLoaderAddNew As image:
+        Height: =1136
+        Image: ='Spinner-1s-200px'
+        Visible: =varAddItemSpinnerVisible
+        Width: =640
+        ZIndex: =5
+
+    btnAddNewBack As button:
+        Fill: =lblHomeScreenTitle.Fill
+        Height: =50
+        OnSelect: =Navigate(ScreenHome, ScreenTransition.Cover);
+        RadiusBottomLeft: =5
+        RadiusBottomRight: =5
+        RadiusTopLeft: =5
+        RadiusTopRight: =5
+        Size: =20
+        Text: ="Back"
+        Tooltip: ="Go To Previous Screen"
+        Visible: =FormAddNewSession.Mode = FormMode.View
+        Width: =150
+        X: =FormAddNewSession.X + 50
+        Y: =FormAddNewSession.Y + FormAddNewSession.Height + 50
+        ZIndex: =6
+
+    btnAddNewNext As button:
+        Color: =btnAddNewBack.Color
+        Fill: =btnAddNewBack.Fill
+        FontWeight: =btnAddNewBack.FontWeight
+        Height: =btnAddNewBack.Height
+        OnSelect: =Navigate(ScreenParentModules, ScreenTransition.Cover)
+        RadiusBottomLeft: =5
+        RadiusBottomRight: =5
+        RadiusTopLeft: =5
+        RadiusTopRight: =5
+        Size: =btnAddNewBack.Size
+        Text: ="Next"
+        Tooltip: ="Go To Next Screen"
+        Visible: =FormAddNewSession.Mode = FormMode.View
+        Width: =btnAddNewBack.Width
+        X: =Parent.Width - Self.Width - 50
+        Y: =FormAddNewSession.Y + FormAddNewSession.Height + 50
+        ZIndex: =7
+
+    IconAddNewEdit As icon.Edit:
+        Color: =IconAddNew.Color
+        Height: =IconAddNew.Height
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.Edit
+        OnSelect: =EditForm(FormAddNewSession)
+        Visible: =FormAddNewSession.Mode = FormMode.View
+        Width: =IconAddNew.Width
+        X: =lblAddNewScreenTitle.Width - Self.Width - 10
+        Y: =IconAddNewSessionHome.Y
+        ZIndex: =8
+
+    IconAddNewSessionHome As icon.Home:
+        Color: =IconAddNew.Color
+        Height: =IconAddNew.Height
+        Icon: =Icon.Home
+        OnSelect: =Navigate(ScreenHome,ScreenTransition.Cover)
+        Tooltip: ="Go To Home"
+        Visible: =FormAddNewSession.Mode = FormMode.View
+        Width: =IconAddNew.Width
+        X: =10
+        Y: =10
+        ZIndex: =9
+
+    ContainerAddNewConsent As groupContainer.manualLayoutContainer:
+        BorderColor: =RGBA(56, 96, 178, 1)
+        Fill: =RGBA(149, 149, 149, 0.8)
+        Height: =1136
+        Visible: =varIsContainerVisible
+        Width: =640
+        ZIndex: =10
+
+        GroupAddNewAlert As group:
+            Height: =5
+            Width: =5
+            X: =40
+            Y: =40
+            ZIndex: =6
+
+            txtControlContainerAddNew As text:
+                Default: =""
+                DisplayMode: =DisplayMode.View
+                Height: =360
+                OnSelect: =(Parent.Height/2)-(Self.Height/2)
+                RadiusBottomLeft: =20
+                RadiusBottomRight: =20
+                RadiusTopLeft: =20
+                RadiusTopRight: =20
+                Size: =21
+                Width: =570
+                X: =(Parent.Width/2) - (Self.Width/2)
+                Y: =376
+                ZIndex: =1
+
+            btnAddNewYes As button:
+                Color: =btnAddNewBack.Color
+                Fill: =btnAddNewBack.Fill
+                FontWeight: =btnAddNewBack.FontWeight
+                Height: =btnAddNewBack.Height
+                OnSelect: |
+                    =UpdateContext({varIsConsent: true});
+                    UpdateContext({varIsContainerVisible: false});
+                    UpdateContext({varAddItemSpinnerVisible: true});
+                    UpdateContext({varTitleErrorMsg: ""});
+                    UpdateContext({varClientnameErrorMsg: ""});
+                    UpdateContext({varSessionTypeErrorMsg: ""});
+                    UpdateContext({varProductErrorMsg: ""});
+                    UpdateContext({varModuleErrorMsg: ""});
+                    UpdateContext({varIsValiddata: false});
+                    UpdateContext({collModules: Blank()});
+                    If(
+                        varIsConsent,
+                        If(
+                            txtTitle.Text = Blank() || txtTitle.Text = "" || txtTitle.Text = " ",
+                            UpdateContext({varIsValiddata: false});
+                            UpdateContext({varTitleErrorMsg: "Title Is Required"})
+                        );
+                        If(
+                            drdpClient.Selected.Id = Blank() || false,
+                            UpdateContext({varIsValiddata: false});
+                            UpdateContext({varClientnameErrorMsg: "Client Name Is Required"})
+                        );
+                        If(
+                            FormAddNewSession.Mode = FormMode.New,
+                            If(
+                                drdpSessionType.Selected.Value = Blank(),
+                                UpdateContext({varIsValiddata: false});
+                                UpdateContext({varSessionTypeErrorMsg: "Session Type Is Required"})
+                            );
+                            If(
+                                drdpProduct.Selected.Value = Blank(),
+                                UpdateContext({varIsValiddata: false});
+                                UpdateContext({varProductErrorMsg: "Product Is Required"})
+                            );
+                            If(
+                                CountIf(
+                                    drdpModules.SelectedItems,
+                                    true
+                                ) <= 0,
+                                UpdateContext({varIsValiddata: false});
+                                UpdateContext({varModuleErrorMsg: "Modules are Required"})
+                            );
+                        );
+                        If(
+                            FormAddNewSession.Mode = FormMode.New,
+                            If(
+                                Not(txtTitle.Text = Blank()) && Not(txtTitle.Text = "") && Not(txtTitle.Text = " ") && Not(drdpClient.Selected.Id = Blank()) || Not(false) && Not(drdpSessionType.Selected.Value = Blank()) && Not(drdpProduct.Selected.Value = Blank()) && !IsBlank(drdpModules.SelectedItems),
+                                UpdateContext({varIsValiddata: true})
+                            )
+                        );
+                        If(
+                            FormAddNewSession.Mode = FormMode.Edit,
+                            If(
+                                Not(txtTitle.Text = Blank()) && Not(txtTitle.Text = "") && Not(txtTitle.Text = " ") && Not(drdpClient.Selected.Id = Blank()) && Not(false),
+                                UpdateContext({varIsValiddata: true})
+                            )
+                        )
+                    );
+                    If(
+                        FormAddNewSession.Mode = FormMode.New,
+                        If(
+                            varIsValiddata,
+                            Set(
+                                varLastSaved,
+                                Last('Training Session Details')
+                            );
+                            ClearCollect(
+                                collSelectedParentModules,
+                                ShowColumns(
+                                    drdpModules.SelectedItems,
+                                    "ID",
+                                    "Title"
+                                )
+                            );
+                            ClearCollect(
+                                collParentModuleJsonObj,
+                                Blank()
+                            );
+                            ClearCollect(
+                                collSubModules,
+                                Blank()
+                            );
+                            ClearCollect(
+                                collSubModulesJsonObj,
+                                Blank()
+                            );
+                            ClearCollect(
+                                collTasks,
+                                Blank()
+                            );
+                            ClearCollect(
+                                collTaskJsonObj,
+                                Blank()
+                            );
+                            ForAll(
+                                collSelectedParentModules,
+                                Collect(
+                                    collParentModuleJsonObj,
+                                    {
+                                        ID: collSelectedParentModules[@ID],
+                                        Title: collSelectedParentModules[@Title],
+                                        IsCompleted: false,
+                                        SubModules: "",
+                                        Remarks: ""
+                                    }
+                                );
+                                Collect(
+                                    collSubModules,
+                                    Filter(
+                                        'Training Sub Module Master',
+                                        'Parent Module ID' = collSelectedParentModules[@ID]
+                                    )
+                                );
+                            );
+                            ForAll(
+                                collSubModules,
+                                Collect(
+                                    collSubModulesJsonObj,
+                                    {
+                                        ID: collSubModules[@ID],
+                                        Title: collSubModules[@Title],
+                                        SubTasks: "",
+                                        'Parent Module ID': collSubModules[@'Parent Module ID']
+                                    }
+                                );
+                                Collect(
+                                    collTasks,
+                                    Filter(
+                                        'Training Module Task Master',
+                                        'Parent Sub Module ID' = collSubModules[@ID]
+                                    )
+                                )
+                            );
+                            ForAll(
+                                collTasks,
+                                Collect(
+                                    collTaskJsonObj,
+                                    {
+                                        ID: collTasks[@ID],
+                                        Title: collTasks[@Title],
+                                        'Parent Sub Module ID': collTasks[@'Parent Sub Module ID']
+                                    }
+                                )
+                            );
+                            ClearCollect(
+                                tempTasks,
+                                Blank()
+                            );
+                            ClearCollect(
+                                collSubModulesWithTasks,
+                                {
+                                    ID: "",
+                                    Title: "",
+                                    SubTasks: tempTasks,
+                                    'Parent Module ID': ""
+                                }
+                            );
+                            ClearCollect(
+                                collParentWithData,
+                                {
+                                    ID: "",
+                                    Title: "",
+                                    SubModules: collSubModulesWithTasks,
+                                    Remarks: "",
+                                    IsCompleted: false
+                                }
+                            );
+                            ForAll(
+                                collSubModulesJsonObj,
+                                Collect(
+                                    tempTasks,
+                                    Filter(
+                                        collTaskJsonObj,
+                                        'Parent Sub Module ID' = collSubModulesJsonObj[@ID]
+                                    )
+                                );
+                                If(
+                                    Not(IsBlank(tempTasks)),
+                                    Patch(
+                                        collSubModulesWithTasks,
+                                        Defaults(collSubModulesWithTasks),
+                                        {
+                                            ID: collSubModulesJsonObj[@ID],
+                                            Title: collSubModulesJsonObj[@Title],
+                                            SubTasks: tempTasks,
+                                            'Parent Module ID': collSubModulesJsonObj[@'Parent Module ID']
+                                        }
+                                    );
+                                    RemoveIf(
+                                        tempTasks,
+                                        true
+                                    );
+                                )
+                            );
+                            Set(
+                                tempVar,
+                                JSON(collSubModulesWithTasks)
+                            );
+                            ClearCollect(
+                                tempSubModule,
+                                Blank()
+                            );
+                            ForAll(
+                                collParentModuleJsonObj,
+                                Collect(
+                                    tempSubModule,
+                                    Filter(
+                                        collSubModulesWithTasks,
+                                        Value('Parent Module ID') = Value(collParentModuleJsonObj[@ID])
+                                    )
+                                );
+                                If(
+                                    Not(IsBlank(tempSubModule)),
+                                    Patch(
+                                        collParentWithData,
+                                        Defaults(collParentWithData),
+                                        {
+                                            ID: collParentModuleJsonObj[@ID],
+                                            Title: collParentModuleJsonObj[@Title],
+                                            SubModules: tempSubModule,
+                                            Remarks: "",
+                                            IsCompleted: collParentModuleJsonObj[@IsCompleted]
+                                        }
+                                    );
+                                    RemoveIf(
+                                        tempSubModule,
+                                        true
+                                    );
+                                )
+                            );
+                            RemoveIf(
+                                collParentWithData,
+                                ID = ""
+                            );
+                            Set(
+                                varFinalParentJson,
+                                JSON(collParentWithData)
+                            );
+                            Set(
+                                varParentModuleJson,
+                                JSON(collParentModuleJsonObj)
+                            );
+                            Set(
+                                varSubModulesJson,
+                                JSON(collSubModulesJsonObj)
+                            );
+                            Set(
+                                varTasksJson,
+                                JSON(collTaskJsonObj)
+                            );
+                            Patch(
+                                'Training Session Details',
+                                Defaults('Training Session Details'),
+                                {
+                                    Title: txtTitle.Text,
+                                    ClientName: {
+                                        Id: drdpClient.Selected.Id,
+                                        Value: drdpClient.Selected.Value
+                                    },
+                                    Product: {
+                                        Id: drdpProduct.Selected.Id,
+                                        Value: drdpProduct.Selected.Value
+                                    },
+                                    'Product ID': drdpProduct.Selected.Id,
+                                    'Module JSON Data': varFinalParentJson,
+                                    'Session Type': {Value: drdpSessionType.Selected.Value},
+                                    'Session Start Date Time': Now(),
+                                    'Session Taken By': {
+                                        '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser",
+                                        DisplayName: User().FullName,
+                                        Claims: "i:0#.f|membership|" & Lower(User().Email),
+                                        Department: "",
+                                        Email: User().Email,
+                                        JobTitle: "",
+                                        Picture: User().Image
+                                    }
+                                }
+                            );
+                            Set(
+                                varIsSubmiited,
+                                false
+                            );
+                            Set(
+                                varNewItemID,
+                                Last('Training Session Details').ID
+                            );
+                            Set(
+                                collCurrentItem,
+                                Last('Training Session Details')
+                            );
+                            ClearCollect(
+                                collSelectedModules,
+                                {}
+                            );
+                            ForAll(
+                                collParentWithData,
+                                Collect(
+                                    collSelectedModules,
+                                    {Value: Title}
+                                )
+                            );
+                            RemoveIf(
+                                collSelectedModules,
+                                Value = Blank()
+                            );
+                            Navigate(
+                                ScreenParentModules,
+                                ScreenTransition.Cover
+                            );
+                        //Navigate(ScreenHome,ScreenTransition.Cover);
+                        //ResetForm(FormAddNewSession);
+                    ,
+                            Notify(
+                                "Please mandatory details and try again while new",
+                                NotificationType.Error,
+                                2000
+                            )
+                        )
+                    );
+                    If(
+                        FormAddNewSession.Mode = FormMode.Edit,
+                        If(
+                            varIsValiddata,
+                            Patch(
+                                'Training Session Details',
+                                GalleryHistoricData.Selected,
+                                {
+                                    Title: txtTitle.Text,
+                                    ClientName: {
+                                        Id: drdpClient.Selected.Id,
+                                        Value: drdpClient.Selected.Value
+                                    }
+                                }
+                            );
+                            Navigate(
+                                ScreenHome,
+                                ScreenTransition.Cover
+                            );
+                            ,
+                            Notify(
+                                "Please mandatory details and try again While edit",
+                                NotificationType.Error,
+                                2000
+                            )
+                        )
+                    );
+                    UpdateContext({varAddItemSpinnerVisible: false});
+                Size: =btnAddNewBack.Size
+                Text: ="Yes"
+                Tooltip: ="Yes"
+                Underline: =true
+                Width: =btnAddNewBack.Width
+                X: =(lblSigMsg.X/2) + (Self.Width/2)
+                Y: =lblAddNewMsg.Y + lblAddNewMsg.Height + 10
+                ZIndex: =2
+
+            btnAddNewNo As button:
+                Color: =btnAddNewBack.Color
+                Fill: =ColorFade(btnAddNewYes.Fill, 20%)
+                FontWeight: =btnAddNewBack.FontWeight
+                Height: =btnAddNewBack.Height
+                OnSelect: |-
+                    =UpdateContext({varIsConsent: false});
+                    UpdateContext({varIsContainerVisible: false});
+                Size: =btnAddNewBack.Size
+                Text: ="No"
+                Tooltip: ="No"
+                Width: =btnAddNewBack.Width
+                X: =(lblAddNewMsg.Width/2) + (Self.Width/1.25)
+                Y: =btnAddNewYes.Y
+                ZIndex: =3
+
+            lblAddNewMsg As label:
+                Align: =Align.Center
+                Height: =txtControlContainerAddNew.Height - lblSigMsgTitleAddNew.Height - btnAddNewYes.Height - 30
+                Size: =lblProduct.Size
+                Text: |-
+                    ="You are going to save the session details, after saving details you will not able to edit some details. 
+                    Do you still want to Save?"
+                Width: =txtControlContainerAddNew.Width - 20
+                X: =lblSigMsgTitleAddNew.X
+                Y: =lblSigMsgTitleAddNew.Y + lblSigMsgTitleAddNew.Height
+                ZIndex: =4
+
+            lblSigMsgTitleAddNew As label:
+                Align: =Align.Center
+                DisabledColor: =RGBA(26, 26, 26, 1)
+                Fill: =lblSigMsg.Fill
+                FontWeight: =FontWeight.Bold
+                Height: =70
+                Size: =21
+                Text: ="Alert"
+                Width: =txtControlContainerAddNew.Width - 20
+                X: =txtControlContainerAddNew.X + 10
+                Y: =txtControlContainerAddNew.Y + 10
+                ZIndex: =5
+

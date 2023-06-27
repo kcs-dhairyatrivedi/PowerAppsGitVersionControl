@@ -1,0 +1,10 @@
+[
+  {
+    "ApiId": "/providers/microsoft.powerapps/apis/shared_logicflows",
+    "FlowNameId": "02c6b6bc-9ad9-4460-af2e-a8db624987ab",
+    "Name": "SoftwareSupport:TrainingChecklist-GetAttachmentContent",
+    "ServiceKind": "ConnectedWadl",
+    "Type": "ServiceInfo",
+    "WorkflowEntityId": "c27eecef-3b9e-ed11-aad1-000d3ac9bd48"
+  }
+]

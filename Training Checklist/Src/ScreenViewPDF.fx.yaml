@@ -1,0 +1,437 @@
+ScreenViewPDF As screen:
+    Fill: =ScreenHome.Fill
+    OnVisible: |-
+        =Set(
+            varDownloadCount,
+            Blank()
+        );
+        ClearCollect(
+            collItemAttachments,
+            GalleryHistoricData.Selected.Attachments
+        );
+        UpdateContext(
+            {
+                varDefaultBodyMsg: "Hi " & Trim(GalleryHistoricData.Selected.ClientName.Value) & ",
+        
+        Kindly find attached PDF file for Training " & Char(34) & GalleryHistoricData.Selected.Title & Char(34) & " held on " & Concatenate(
+                    Text(
+                        DateValue(GalleryHistoricData.Selected.'Session Start Date Time'),
+                        "dd/mm/yyyy"
+                    ),
+                    " ",
+                    Text(
+                        If(
+                            Mod(
+                                Hour(GalleryHistoricData.Selected.'Session Start Date Time'),
+                                12
+                            ) = 0,
+                            Concatenate(
+                                12,
+                                ":",
+                                If(
+                                    Len(Minute(GalleryHistoricData.Selected.'Session Start Date Time')) = 1,
+                                    Concatenate(
+                                        "0",
+                                        Minute(GalleryHistoricData.Selected.'Session Start Date Time')
+                                    ),
+                                    Minute(GalleryHistoricData.Selected.'Session Start Date Time')
+                                )
+                            ),
+                            Concatenate(
+                                Mod(
+                                    Hour(GalleryHistoricData.Selected.'Session Start Date Time'),
+                                    12
+                                ),
+                                ":",
+                                If(
+                                    Len(Minute(GalleryHistoricData.Selected.'Session Start Date Time')) = 1,
+                                    Concatenate(
+                                        "0",
+                                        Minute(GalleryHistoricData.Selected.'Session Start Date Time')
+                                    ),
+                                    Minute(GalleryHistoricData.Selected.'Session Start Date Time')
+                                )
+                            )
+                        ),
+                        "[$-en-US]00"
+                    ),
+                    If(
+                        Hour(GalleryHistoricData.Selected.'Session Start Date Time') < 12,
+                        " AM",
+                        " PM"
+                    )
+                ) & ".
+                
+        Regards,
+        KCS Support Team"
+            }
+        );
+        UpdateContext({varDefaultSubjectMsg: "Training Details: " & GalleryHistoricData.Selected.Title});
+
+    lblViewPDFTitle As label:
+        Align: =Align.Center
+        Color: =lblHomeScreenTitle.Color
+        Fill: =lblHomeScreenTitle.Fill
+        Height: =lblHomeScreenTitle.Height
+        Size: =lblHomeScreenTitle.Size
+        Text: ="View PDF"
+        Width: =640
+        ZIndex: =1
+
+    PdfViewer1 As pdfViewer:
+        BorderColor: =RGBA(0, 0, 0, 1)
+        DisplayMode: =DisplayMode.View
+        Document: =First(GalleryHistoricData.Selected.Attachments).Value
+        Fill: =GalleryHistoricData.Fill
+        Height: =FormAddNewSession.Height
+        ShowControls: =true
+        Y: =lblViewPDFTitle.Y + lblViewPDFTitle.Height
+        ZIndex: =2
+
+    btnDownloadPDF As icon.Download:
+        Color: =IconAddNew.Color
+        Height: =NextArrow1.Height
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.Download
+        OnSelect: |-
+            =Set(
+                varDownloadCount,
+                First(
+                    Filter(
+                        'Training Session Details',
+                        ID = GalleryHistoricData.Selected.ID
+                    )
+                ).'Numbers Of Download'
+            );
+            If(
+                IsBlank(varDownloadCount),
+                Set(
+                    varDownloadCount,
+                    1
+                ),
+                Set(
+                    varDownloadCount,
+                    varDownloadCount + 1
+                )
+            );
+            Patch(
+                'Training Session Details',
+                {ID: GalleryHistoricData.Selected.ID},
+                {
+                    'Last Download Date Time': Now(),
+                    'Numbers Of Download': varDownloadCount,
+                    'Last Download By': User().Email
+                }
+            );
+            Download("https://kcsglobal.sharepoint.com/sites/Software-Support/_layouts/15/download.aspx?SourceUrl=" & varAttachmentRelativeURL)
+        Tooltip: ="Download"
+        Width: =NextArrow1.Width
+        X: =lblViewPDFTitle.Width - Self.Width - 10
+        Y: =IconAddNewSessionHome.Y
+        ZIndex: =3
+
+    btnSharePDF As icon.Share:
+        Color: =IconAddNew.Color
+        Height: =NextArrow1.Height
+        HoverColor: =IconAddNew.HoverColor
+        Icon: =Icon.Share
+        OnSelect: |-
+            =UpdateContext({varIsContainerVisible: true});
+            UpdateContext({varEmailErrorMsg: ""});
+            Reset(txtEmail);
+            Reset(txtSubject);
+            Reset(txtEmailBody)
+        Tooltip: ="Share as Email"
+        Width: =NextArrow1.Width
+        X: =btnDownloadPDF.X - Self.Width - 5
+        Y: =IconAddNewSessionHome.Y
+        ZIndex: =4
+
+    IconViewPDFHome As icon.Home:
+        Color: =IconAddNew.Color
+        Height: =IconAddNew.Height
+        Icon: =Icon.Home
+        OnSelect: =Navigate(ScreenHome,ScreenTransition.Cover)
+        Tooltip: =IconAddNewSessionHome.Tooltip
+        Visible: =FormAddNewSession.Mode = FormMode.View
+        Width: =IconAddNew.Width
+        X: =IconAddNewSessionHome.X
+        Y: =IconAddNewSessionHome.Y
+        ZIndex: =5
+
+    ContainerComposeEmail As groupContainer.manualLayoutContainer:
+        BorderColor: =RGBA(56, 96, 178, 1)
+        Fill: =ContainerAddNewConsent.Fill
+        Height: =1136
+        Visible: =varIsContainerVisible
+        Width: =640
+        ZIndex: =6
+
+        RectangleComposEmail As rectangle:
+            Fill: =GalleryHistoricData.Fill
+            Height: =940
+            Width: =ContainerComposeEmail.Width
+            Y: =150
+            ZIndex: =1
+
+        lblEmailAddress As label:
+            Color: =lblTitle.Color
+            Height: =50
+            Size: =lblProduct.Size
+            Text: ="Email Address *"
+            Width: =RectangleComposEmail.Width - 20
+            X: =RectangleComposEmail.X + 10
+            Y: =RectangleComposEmail.Y + 30
+            ZIndex: =2
+
+        btnComposeEmailSend As button:
+            Height: =btnAddNewYes.Height
+            OnSelect: |
+                =UpdateContext({varIsConsent: true});
+                UpdateContext({varAddItemSpinnerVisible: true});
+                UpdateContext({varEmailErrorMsg: ""});
+                If(
+                    varIsConsent,
+                    If(
+                        txtEmail.Text = Blank() || txtEmail.Text = "" || txtEmail.Text = " ",
+                        UpdateContext({varIsValiddata: false});
+                        UpdateContext({varEmailErrorMsg: "Email address Is Required"})
+                    );
+                    If(
+                        Not(txtEmail.Text = Blank()) && Not(txtEmail.Text = "") && Not(txtEmail.Text = " "),
+                        UpdateContext({varIsValiddata: true})
+                    )
+                );
+                If(
+                    varIsValiddata,
+                    UpdateContext({varEmailSpinner: true});
+                    If(
+                        txtSubject.Text = Blank() || txtSubject.Text = "" || txtSubject.Text = " ",
+                        UpdateContext({varSubjectMsg: varDefaultSubjectMsg}),
+                        UpdateContext({varSubjectMsg: txtSubject.Text})
+                    );
+                    If(
+                        txtEmailBody.Text = Blank() || txtEmailBody.Text = "" || txtEmailBody.Text = " ",
+                        UpdateContext({varBodyMsg: varDefaultBodyMsg}),
+                        UpdateContext({varBodyMsg: txtEmailBody.Text})
+                    );
+                    Office365Outlook.SendEmail(
+                        txtEmail,
+                        varSubjectMsg,
+                        varBodyMsg,
+                        {
+                            From: User().Email,
+                            Cc: "admin@techworkhive.onmicrosoft.com",
+                            Bcc: Blank(),
+                            Attachments: Table(
+                                {
+                                    Name: First(collItemAttachments).DisplayName,
+                                    ContentBytes: First(GalleryHistoricData.Selected.Attachments).Value
+                                }
+                            )
+                        }
+                    );
+                    Notify(
+                        "Email Send Successfully",
+                        NotificationType.Success,
+                        2000
+                    );
+                    ClearCollect(
+                        collCurrentInfo,
+                        Filter(
+                            'Training Session Details',
+                            ID = GalleryHistoricData.Selected.ID
+                        )
+                    );
+                    If(
+                        CountIf(
+                            collCurrentInfo,
+                            true
+                        ) > 0,
+                        ClearCollect(
+                            collItemEmailInfo,
+                            ForAll(
+                                Table(ParseJSON(First(collCurrentInfo).'Email Information')),
+                                {
+                                    SendTo: Text(Value.SendTo),
+                                    CC: Text(Value.CC),
+                                    SendFrom: Text(Value.SendFrom),
+                                    AttachmentTitle: Text(Value.AttachmentTitle),
+                                    DateAndTime: Text(Value.DateAndTime)
+                                }
+                            )
+                        )
+                    );
+                    Patch(
+                        collItemEmailInfo,
+                        Defaults(collItemEmailInfo),
+                        {
+                            SendTo: txtEmail.Text,
+                            CC: "admin@techworkhive.onmicrosoft.com",
+                            SendFrom: User().Email,
+                            AttachmentTitle: First(collItemAttachments).DisplayName,
+                            DateAndTime: Now()
+                        }
+                    );
+                    Patch(
+                        'Training Session Details',
+                        {ID: GalleryHistoricData.Selected.ID},
+                        {
+                            IsEmailSend: true,
+                            'Email Information': JSON(collItemEmailInfo)
+                        }
+                    );
+                    UpdateContext({varIsContainerVisible: false});
+                    ,
+                    Notify(
+                        "Please mandatory details and try again",
+                        NotificationType.Error,
+                        2000
+                    )
+                );
+                UpdateContext({varEmailSpinner: false});
+            Size: =lblProduct.Size
+            Text: ="Send"
+            Underline: =true
+            Width: =btnAddNewYes.Width
+            X: =68
+            Y: =Attachment.Y + Attachment.Height +40
+            ZIndex: =3
+
+        btnComposeEmailCancel As button:
+            Height: =btnAddNewYes.Height
+            OnSelect: |-
+                =UpdateContext({varIsConsent: false});
+                UpdateContext({varIsContainerVisible: false});
+            Size: =lblProduct.Size
+            Text: ="Cancel"
+            Width: =btnAddNewYes.Width
+            X: =368
+            Y: =Attachment.Y + Attachment.Height +40
+            ZIndex: =4
+
+        txtEmail As text:
+            Default: =""
+            Height: =50
+            Size: =lblProduct.Size
+            Width: =lblEmailAddress.Width
+            X: =lblEmailAddress.X
+            Y: =lblEmailAddress.Y + lblEmailAddress.Height
+            ZIndex: =5
+
+        lblSubject As label:
+            Color: =lblTitle.Color
+            Height: =50
+            Size: =lblProduct.Size
+            Text: ="Subject"
+            Width: =lblEmailAddress.Width
+            X: =txtEmail.X
+            Y: =lblInfo.Y + lblInfo.Height + 40
+            ZIndex: =6
+
+        txtSubject As text:
+            Default: =varDefaultSubjectMsg
+            Height: =50
+            Size: =lblProduct.Size
+            Width: =lblEmailAddress.Width
+            X: =lblSubject.X
+            Y: =lblSubject.Y + lblSubject.Height
+            ZIndex: =7
+
+        lblMsg As label:
+            Color: =lblTitle.Color
+            Height: =50
+            Size: =lblProduct.Size
+            Text: ="Message"
+            Width: =lblEmailAddress.Width
+            X: =txtSubject.X
+            Y: =txtSubject.Y + txtSubject.Height + 20
+            ZIndex: =8
+
+        lblEmailAddressErrorMsg As label:
+            AutoHeight: =true
+            Color: =RGBA(255, 0, 0, 1)
+            Height: =10
+            Size: =18
+            Text: =varEmailErrorMsg
+            Width: =RectangleComposEmail.Width - 20
+            X: =lblEmailAddress.X
+            Y: =lblInfo.Y + lblInfo.Height
+            ZIndex: =10
+
+        Attachment As attachments:
+            BorderColor: =//If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+            Default: =First(collItemAttachments)
+            DisplayMode: =DisplayMode.Disabled
+            Height: =90
+            IsInDataCard: =true
+            Items: =collItemAttachments
+            PaddingBottom: =5
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5
+            PaddingTop: =5
+            Size: =lblProduct.Size
+            Tooltip: =
+            Width: =lblEmailAddress.Width
+            X: =lblAttachment.X
+            Y: =lblAttachment.Y + lblAttachment.Height
+            ZIndex: =11
+
+        lblAttachment As label:
+            Color: =lblTitle.Color
+            Height: =50
+            Size: =lblProduct.Size
+            Text: ="Attachment PDF"
+            Width: =lblEmailAddress.Width
+            X: =txtEmailBody.X
+            Y: =txtEmailBody.Y + txtEmailBody.Height + 20
+            ZIndex: =12
+
+        txtEmailBody As text:
+            Clear: =true
+            Default: =varDefaultBodyMsg
+            Height: =240
+            Mode: =TextMode.MultiLine
+            Size: =lblProduct.Size
+            Width: =lblEmailAddress.Width
+            X: =lblMsg.X
+            Y: =lblMsg.Y + lblMsg.Height
+            ZIndex: =13
+
+        lblInfo As label:
+            AutoHeight: =true
+            Height: =10
+            Size: =17
+            Text: ="Use semicolon ';' to send email to multiple users."
+            Width: =lblEmailAddress.Width
+            X: =lblEmailAddress.X
+            Y: =txtEmail.Y + txtEmail.Height
+            ZIndex: =14
+
+    ImgViewPDFLoader As image:
+        Height: =RectangleComposEmail.Height
+        Image: ='Spinner-1s-200px'
+        Visible: =varEmailSpinner
+        Width: =RectangleComposEmail.Width
+        X: =RectangleComposEmail.X
+        Y: =RectangleComposEmail.Y
+        ZIndex: =7
+
+    btnViewPDFBack As button:
+        Color: =btnAddNewBack.Color
+        Fill: =btnAddNewBack.Fill
+        FontWeight: =btnAddNewBack.FontWeight
+        Height: =btnAddNewBack.Height
+        OnSelect: =If(varIsHomeClick,Navigate(ScreenHome, ScreenTransition.Cover); ,Navigate(ScreenSignature, ScreenTransition.Cover);)
+        RadiusBottomLeft: =5
+        RadiusBottomRight: =5
+        RadiusTopLeft: =5
+        RadiusTopRight: =5
+        Size: =btnAddNewBack.Size
+        Text: ="Back"
+        Tooltip: =btnAddNewBack.Tooltip
+        Width: =btnAddNewBack.Width
+        X: =PdfViewer1.X + 50
+        Y: =PdfViewer1.Y + PdfViewer1.Height + 50
+        ZIndex: =8
+

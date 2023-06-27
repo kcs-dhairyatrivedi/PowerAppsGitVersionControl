@@ -1,0 +1,10 @@
+[
+  {
+    "ApiId": "/providers/microsoft.powerapps/apis/shared_logicflows",
+    "FlowNameId": "0a7ecd15-12a7-4f7e-b52a-2f80eb7cb526",
+    "Name": "SoftwareSupport:TrainingChecklist-CreateandSavePdftoSharePointitem",
+    "ServiceKind": "ConnectedWadl",
+    "Type": "ServiceInfo",
+    "WorkflowEntityId": "c37eecef-3b9e-ed11-aad1-000d3ac9bd48"
+  }
+]

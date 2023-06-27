@@ -1,0 +1,32 @@
+{
+  "QualifiedValues": [
+    {
+      "Kind": "default.cds_cra30_attendancetraining_forms",
+      "Namespace": "AttendanceTraining (Forms)",
+      "Values": {
+        "Information": "38b31d02-b4b4-46af-b834-df1b7d0a75a4"
+      }
+    },
+    {
+      "Kind": "default.cds_cra30_attendeedetails_forms",
+      "Namespace": "AttendeeDetails (Forms)",
+      "Values": {
+        "Information": "caeabd38-73b8-4b36-b5e6-bf3e529580df"
+      }
+    },
+    {
+      "Kind": "default.cds_cra30_softwaresupportconfigurationmaster_forms",
+      "Namespace": "Software Support Configuration Masters (Forms)",
+      "Values": {
+        "Information": "c18e056d-23bc-4e97-82ed-ce301b3df76e"
+      }
+    },
+    {
+      "Kind": "default.cds_cra30_softwaresupportadmins_forms",
+      "Namespace": "Software Support Admins (Forms)",
+      "Values": {
+        "Information": "9825097c-10ed-4bf6-8c07-c035408d2bc8"
+      }
+    }
+  ]
+}
