@@ -428,7 +428,7 @@ ScreenViewPDF As screen:
         RadiusTopLeft: =5
         RadiusTopRight: =5
         Size: =btnAddNewBack.Size
-        Text: ="Back"
+        Text: ="Back B2"
         Tooltip: =btnAddNewBack.Tooltip
         Width: =btnAddNewBack.Width
         X: =PdfViewer1.X + 50
