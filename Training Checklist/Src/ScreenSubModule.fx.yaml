@@ -274,7 +274,7 @@ ScreenSubModule As screen:
         RadiusTopLeft: =5
         RadiusTopRight: =5
         Size: =20
-        Text: ="Back"
+        Text: ="Back B1"
         Tooltip: =btnAddNewBack.Tooltip
         Visible: =Not(IsUpdate)
         Width: =150
